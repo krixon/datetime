@@ -1,0 +1,23 @@
+{
+  "name": "krixon/datetime",
+  "description": "Datetime value objects.",
+  "type": "library",
+  "license": "proprietary",
+  "support": {
+    "issues": "https://bitbucket.org/krixon/datetime/issues",
+    "wiki": "https://bitbucket.org/krixon/datetime/wiki"
+  },
+  "autoload": {
+    "psr-4": {
+      "Krixon\\DateTime\\": "src"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "Krixon\\DateTime\\Test\\": "test"
+    }
+  },
+  "require-dev": {
+    "phpunit/phpunit": "5.4.*"
+  }
+}
