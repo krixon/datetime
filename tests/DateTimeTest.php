@@ -279,4 +279,15 @@ class DateTimeTest extends \PHPUnit_Framework_TestCase
             ],
         ];
     }
+    
+    
+    /**
+     * @covers ::withTimeAtMidnight
+     */
+    public function testWithTimeAtMidnight()
+    {
+        $date = DateTime::create('2015-09-15T13:46:21Z')->withTimeAtMidnight();
+        
+        self::assertSame('2015-09-15T00:00:00+00:00', $date->format('c'));
+    }
 }

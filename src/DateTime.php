@@ -86,6 +86,21 @@ class DateTime implements \Serializable, \JsonSerializable
     
     
     /**
+     * Returns a new instance with the time set to midnight.
+     *
+     * @return DateTime
+     */
+    public function withTimeAtMidnight()
+    {
+        $instance = clone $this;
+        
+        $instance->wrapped->setTime(0, 0, 0);
+        
+        return $instance;
+    }
+    
+    
+    /**
      * @param DateTime $other
      * @param bool     $absolute
      *
