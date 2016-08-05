@@ -39,6 +39,15 @@ class DateTime implements \Serializable, \JsonSerializable
     
     
     /**
+     * @inheritdoc
+     */
+    public function __clone()
+    {
+        $this->wrapped = clone $this->wrapped;
+    }
+    
+    
+    /**
      * @param string            $time
      * @param DateTimeZone|null $timezone
      *

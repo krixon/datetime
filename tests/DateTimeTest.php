@@ -312,4 +312,18 @@ class DateTimeTest extends \PHPUnit_Framework_TestCase
         
         self::assertSame('2015-09-14T00:00:00+00:00', $date->format('c'));
     }
+    
+    
+    /**
+     * @covers ::__clone
+     */
+    public function testClonesDoNotShareSameWrappedDateTime()
+    {
+        $a = DateTime::create('2016-01-01T00:00:00Z');
+        $b = clone $a;
+        $b = $b->add('P1Y');
+        
+        self::assertSame('2017-01-01T00:00:00+00:00', $b->format('c'));
+        self::assertSame('2016-01-01T00:00:00+00:00', $a->format('c'), 'Instance has been mutated.');
+    }
 }
