@@ -290,4 +290,26 @@ class DateTimeTest extends \PHPUnit_Framework_TestCase
         
         self::assertSame('2015-09-15T00:00:00+00:00', $date->format('c'));
     }
+    
+    
+    /**
+     * @covers ::withDateAtStartOfYear
+     */
+    public function testWithDateAtStartOfYear()
+    {
+        $date = DateTime::create('2015-09-15T13:46:21Z')->withDateAtStartOfYear();
+        
+        self::assertSame('2015-01-01T00:00:00+00:00', $date->format('c'));
+    }
+    
+    
+    /**
+     * @covers ::withDateAtStartOfWeek
+     */
+    public function testWithDateAtStartOfWeek()
+    {
+        $date = DateTime::create('2015-09-15T13:46:21Z')->withDateAtStartOfWeek("en_GB");
+        
+        self::assertSame('2015-09-14T00:00:00+00:00', $date->format('c'));
+    }
 }

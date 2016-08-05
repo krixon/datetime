@@ -86,15 +86,101 @@ class DateTime implements \Serializable, \JsonSerializable
     
     
     /**
+     * Returns a new instance with the time set accordingly.
+     *
+     * @param int $hour
+     * @param int $minute
+     * @param int $second
+     *
+     * @return DateTime
+     */
+    public function withTimeAt(int $hour = 0, int $minute = 0, int $second = 0) : DateTime
+    {
+        $instance = clone $this;
+        
+        $instance->wrapped->setTime($hour, $minute, $second);
+        
+        return $instance;
+    }
+    
+    
+    /**
+     * Returns a new instance with the date set accordingly.
+     *
+     * @param int $year
+     * @param int $month
+     * @param int $day
+     *
+     * @return DateTime
+     */
+    public function withDateAt(int $year, int $month = 1, int $day = 1) : DateTime
+    {
+        $instance = clone $this;
+    
+        $instance->wrapped->setDate($year, $month, $day);
+    
+        return $instance;
+    }
+    
+    
+    /**
      * Returns a new instance with the time set to midnight.
      *
      * @return DateTime
      */
-    public function withTimeAtMidnight()
+    public function withTimeAtMidnight() : DateTime
     {
-        $instance = clone $this;
+        return $this->withTimeAt(0, 0, 0);
+    }
+    
+    
+    /**
+     * Returns a new instance with the date set to 1st of Jan in the current year and time set to midnight.
+     *
+     * @return DateTime
+     */
+    public function withDateAtStartOfYear() : DateTime
+    {
+        $instance = $this->withTimeAtMidnight();
         
-        $instance->wrapped->setTime(0, 0, 0);
+        $instance->wrapped->setDate($instance->format('Y'), 1, 1);
+        
+        return $instance;
+    }
+    
+    
+    /**
+     * Returns a new instance with the date set to 1st of the current month and time set to midnight.
+     *
+     * @return DateTime
+     */
+    public function withDateAtStartOfMonth() : DateTime
+    {
+        $instance = $this->withTimeAtMidnight();
+        
+        $instance->wrapped->setDate($instance->format('Y'), $instance->format('n'), 1);
+        
+        return $instance;
+    }
+    
+    
+    /**
+     * Returns a new instance with the date set to 1st of the current month and time set to midnight.
+     *
+     * @param string|null $locale The locale with which to determine the week start day. If not set the default locale
+     *                            will be used.
+     *
+     * @return DateTime
+     */
+    public function withDateAtStartOfWeek(string $locale = null) : DateTime
+    {
+        $instance = $this->withTimeAtMidnight();
+        $calendar = \IntlCalendar::createInstance(null, $locale);
+        
+        $calendar->setTime($instance->timestamp() * 1000);
+        $calendar->set(\IntlCalendar::FIELD_DOW_LOCAL, 1);
+        
+        $instance->wrapped->setTimestamp((int)($calendar->getTime() / 1000));
         
         return $instance;
     }
