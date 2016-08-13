@@ -301,6 +301,24 @@ class DateTime implements \Serializable, \JsonSerializable
     
     
     /**
+     * @return bool
+     */
+    public function isInThePast() : bool
+    {
+        return $this->isEarlierThan(static::now());
+    }
+    
+    
+    /**
+     * @return bool
+     */
+    public function isInTheFuture() : bool
+    {
+        return $this->isLaterThan(static::now());
+    }
+    
+    
+    /**
      * @param DateTime $a
      * @param DateTime $b
      *

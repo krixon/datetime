@@ -281,6 +281,30 @@ class DateTimeTest extends \PHPUnit_Framework_TestCase
     }
     
     
+    public function testIsInTheFuture()
+    {
+        $now    = DateTime::now();
+        $future = $now->add('PT1H');
+        $past   = $now->subtract('PT1H');
+        
+        self::assertTrue($future->isInTheFuture());
+        self::assertFalse($past->isInTheFuture());
+        self::assertFalse($now->isInTheFuture());
+    }
+    
+    
+    public function testIsInThePast()
+    {
+        $now    = DateTime::now();
+        $future = $now->add('PT1H');
+        $past   = $now->subtract('PT1H');
+    
+        self::assertTrue($past->isInThePast());
+        self::assertFalse($future->isInThePast());
+        self::assertFalse($now->isInThePast());
+    }
+    
+    
     /**
      * @covers ::withTimeAtMidnight
      */
