@@ -167,7 +167,23 @@ class DateTime implements \Serializable, \JsonSerializable
     {
         $instance = $this->withTimeAtMidnight();
         
-        $instance->wrapped->setDate($instance->format('Y'), $instance->format('n'), 1);
+        $instance->wrapped->setDate($instance->year(), $instance->month(), 1);
+        
+        return $instance;
+    }
+    
+    
+    /**
+     * Returns a new instance with the date set to last day of the current month and time set to midnight.
+     *
+     * @return DateTime
+     */
+    public function withDateAtEndOfMonth() : DateTime
+    {
+        $instance = $this->withDateAtStartOfMonth();
+        
+        $instance->wrapped->modify('+1 month');
+        $instance->wrapped->modify('-1 day');
         
         return $instance;
     }
