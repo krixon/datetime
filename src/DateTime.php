@@ -228,6 +228,50 @@ class DateTime implements \Serializable, \JsonSerializable
     
     
     /**
+     * The year as an integer.
+     *
+     * @return int
+     */
+    public function year() : int
+    {
+        return (int)$this->format('Y');
+    }
+    
+    
+    /**
+     * The month as an integer from 1-12.
+     *
+     * @return int
+     */
+    public function month() : int
+    {
+        return (int)$this->format('n');
+    }
+    
+    
+    /**
+     * The day of the month as an integer from 1-31.
+     *
+     * @return int
+     */
+    public function day() : int
+    {
+        return (int)$this->format('j');
+    }
+    
+    
+    /**
+     * The number of days in the current month as an integer from 28-31.
+     *
+     * @return int
+     */
+    public function daysInMonth() : int
+    {
+        return (int)$this->format('t');
+    }
+    
+        
+    /**
      * @return int
      */
     public function timestamp()
