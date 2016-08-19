@@ -90,4 +90,15 @@ class DateRange
         
         return $other->from->equals($this->from) && $other->until->equals($this->until);
     }
+    
+    
+    /**
+     * The total number of days in the range.
+     *
+     * @return int
+     */
+    public function totalDays() : int
+    {
+        return $this->from->withTimeAtMidnight()->diff($this->until->withTimeAtMidnight())->days;
+    }
 }
