@@ -94,7 +94,7 @@ class DateRangeTest extends \PHPUnit_Framework_TestCase
     
     
     /**
-     * @covers totalDays
+     * @covers ::totalDays
      */
     public function testTotalDays()
     {
@@ -104,5 +104,19 @@ class DateRangeTest extends \PHPUnit_Framework_TestCase
         $range = new DateRange($from, $until);
         
         self::assertSame(365, $range->totalDays());
+    }
+    
+    
+    /**
+     * @covers ::totalWeeks
+     */
+    public function testTotalWeeks()
+    {
+        $from  = DateTime::create('2016-01-01T00:00:00Z');
+        $until = DateTime::create('2015-01-01T00:00:00Z');
+        
+        $range = new DateRange($from, $until);
+        
+        self::assertSame(52, $range->totalWeeks());
     }
 }

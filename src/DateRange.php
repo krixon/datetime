@@ -101,4 +101,17 @@ class DateRange
     {
         return $this->from->withTimeAtMidnight()->diff($this->until->withTimeAtMidnight())->days;
     }
+    
+    
+    /**
+     * The total number of whole weeks in the range.
+     *
+     * Note that this does not include partial weeks, so a range spanning 15 days will return 2.
+     *
+     * @return int
+     */
+    public function totalWeeks() : int
+    {
+        return (int)($this->totalDays() / 7);
+    }
 }
