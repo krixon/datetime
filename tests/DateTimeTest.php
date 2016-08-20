@@ -339,6 +339,28 @@ class DateTimeTest extends \PHPUnit_Framework_TestCase
     
     
     /**
+     * @covers ::withDateAtStartOfMonth
+     */
+    public function testWithDateAtStartOfMonth()
+    {
+        $date = DateTime::create('2015-09-15T13:46:21Z')->withDateAtStartOfMonth();
+        
+        self::assertSame('2015-09-01T00:00:00+00:00', $date->format('c'));
+    }
+    
+    
+    /**
+     * @covers ::withDateAtEndOfMonth
+     */
+    public function testWithDateAtEndOfMonth()
+    {
+        $date = DateTime::create('2015-09-15T13:46:21Z')->withDateAtEndOfMonth();
+        
+        self::assertSame('2015-09-30T00:00:00+00:00', $date->format('c'));
+    }
+    
+    
+    /**
      * @covers ::__clone
      */
     public function testClonesDoNotShareSameWrappedDateTime()
