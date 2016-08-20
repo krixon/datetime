@@ -171,7 +171,7 @@ class DateInterval
             $specification .= $days . 'D';
         }
         
-        if ($hours || $minutes || $seconds || $microseconds) {
+        if ($hours || $minutes || $seconds) {
             $specification .= 'T';
             
             if ($hours) {
