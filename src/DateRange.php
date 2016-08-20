@@ -2,8 +2,6 @@
 
 namespace Krixon\DateTime;
 
-use DateInterval;
-
 /**
  * A period of time between two dates.
  */
@@ -18,6 +16,16 @@ class DateRange
      * @var DateTime
      */
     private $until;
+    
+    /**
+     * @var DateInterval
+     */
+    private $dateDiff;
+    
+    /**
+     * @var DateInterval
+     */
+    private $fullDiff;
     
     
     /**
@@ -40,7 +48,7 @@ class DateRange
      *
      * @return DateTime
      */
-    public function from()
+    public function from() : DateTime
     {
         return $this->from;
     }
@@ -51,7 +59,7 @@ class DateRange
      *
      * @return DateTime
      */
-    public function until()
+    public function until() : DateTime
     {
         return $this->until;
     }
@@ -60,11 +68,11 @@ class DateRange
     /**
      * An interval representing the difference between the from and until dates.
      *
-     * @return bool|DateInterval
+     * @return DateInterval
      */
-    public function diff()
+    public function diff() : DateInterval
     {
-        return $this->from->diff($this->until);
+        return clone $this->fullDiff();
     }
     
     
@@ -110,13 +118,24 @@ class DateRange
     
     
     /**
-     * The total number of days in the range.
+     * The total number of years in the range.
      *
      * @return int
      */
-    public function totalDays() : int
+    public function totalYears() : int
     {
-        return $this->from->withTimeAtMidnight()->diff($this->until->withTimeAtMidnight())->days;
+        return $this->dateDiff()->y;
+    }
+    
+    
+    /**
+     * The total number of months in the range.
+     *
+     * @return int
+     */
+    public function totalMonths() : int
+    {
+        return ($this->totalYears() * 12) + $this->dateDiff()->m;
     }
     
     
@@ -132,6 +151,47 @@ class DateRange
      */
     public function totalWeeks() : int
     {
-        return (int)($this->totalDays() / 7);
+        return $this->totalDays() / 7;
+    }
+    
+    
+    /**
+     * The total number of days in the range.
+     *
+     * @return int
+     */
+    public function totalDays() : int
+    {
+        return $this->dateDiff()->totalDays();
+    }
+    
+    
+    /**
+     * A diff between the two dates with times set to midnight to guarantee resolution to whole days.
+     *
+     * @return DateInterval
+     */
+    private function dateDiff() : DateInterval
+    {
+        if (null === $this->dateDiff) {
+            $this->dateDiff = $this->from->withTimeAtMidnight()->diff($this->until->withTimeAtMidnight());
+        }
+        
+        return $this->dateDiff;
+    }
+    
+    
+    /**
+     * A full diff between the two dates.
+     *
+     * @return DateInterval
+     */
+    private function fullDiff() : DateInterval
+    {
+        if (null === $this->fullDiff) {
+            $this->fullDiff = $this->from->diff($this->until);
+        }
+        
+        return $this->fullDiff;
     }
 }

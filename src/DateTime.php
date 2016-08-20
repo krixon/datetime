@@ -2,8 +2,9 @@
 
 namespace Krixon\DateTime;
 
-use DateInterval;
 use DateTimeZone;
+use IntlCalendar;
+use IntlTimeZone;
 
 /**
  * A facade around \DateTime to ensure immutability while maintaining a single type of DateTime object.
@@ -66,7 +67,21 @@ class DateTime implements \Serializable, \JsonSerializable
      */
     public static function now(DateTimeZone $timezone = null) : DateTime
     {
-        return new static('now', $timezone);
+        // Ensure microsecond precision.
+        
+        list($microsecond, $second) = explode(' ', microtime());
+        
+        $microsecond *= 10 ** 6;
+        $second *= 10 ** 6;
+        $timestamp = $second + $microsecond;
+        
+        $instance = static::fromTimestampWithMicroseconds($timestamp);
+        
+        if ($timezone) {
+            $instance->wrapped->setTimezone($timezone);
+        }
+        
+        return $instance;
     }
     
     
@@ -95,6 +110,22 @@ class DateTime implements \Serializable, \JsonSerializable
     
     
     /**
+     * Creates a new instance from a microsecond-precision unix timestamp.
+     *
+     * @param int $timestamp
+     *
+     * @return DateTime
+     */
+    public static function fromTimestampWithMicroseconds(int $timestamp) : DateTime
+    {
+        $seconds      = (int)($timestamp / 10 ** 6);
+        $microseconds = $timestamp - ($seconds * 10 ** 6);
+        
+        return static::fromFormat('U.u', $seconds . '.' . $microseconds);
+    }
+    
+    
+    /**
      * Creates a new instance from an internal \DateTime object.
      *
      * @param \DateTime $date
@@ -112,26 +143,9 @@ class DateTime implements \Serializable, \JsonSerializable
     
     
     /**
-     * Returns a new instance with the time set accordingly.
-     *
-     * @param int $hour
-     * @param int $minute
-     * @param int $second
-     *
-     * @return DateTime
-     */
-    public function withTimeAt(int $hour = 0, int $minute = 0, int $second = 0) : DateTime
-    {
-        $instance = clone $this;
-        
-        $instance->wrapped->setTime($hour, $minute, $second);
-        
-        return $instance;
-    }
-    
-    
-    /**
      * Returns a new instance with the date set accordingly.
+     *
+     * Any omitted values will default to the current value.
      *
      * @param int $year
      * @param int $month
@@ -139,12 +153,90 @@ class DateTime implements \Serializable, \JsonSerializable
      *
      * @return DateTime
      */
-    public function withDateAt(int $year, int $month = 1, int $day = 1) : DateTime
+    public function withDateAt(int $year = null, int $month = null, int $day = null) : DateTime
     {
+        if (null === $year && null === $month && null === $day) {
+            return $this;
+        }
+        
+        $year  = $year === null ? $this->year() : $year;
+        $month = $month ?: $this->month();
+        $day   = $day   ?: $this->day();
+        
         $instance = clone $this;
-    
+        
         $instance->wrapped->setDate($year, $month, $day);
+        
+        return $instance;
+    }
     
+    
+    /**
+     * @param int $year
+     *
+     * @return DateTime
+     */
+    public function withYear(int $year) : DateTime
+    {
+        return $this->withDateAt($year);
+    }
+    
+    
+    /**
+     * @param int $month
+     *
+     * @return DateTime
+     */
+    public function withMonth(int $month) : DateTime
+    {
+        return $this->withDateAt(null, $month);
+    }
+    
+    
+    /**
+     * @param int $day
+     *
+     * @return DateTime
+     */
+    public function withDay(int $day) : DateTime
+    {
+        return $this->withDateAt(null, null, $day);
+    }
+    
+    
+    /**
+     * Returns a new instance with the time set accordingly.
+     *
+     * Any omitted values will default to the current value.
+     *
+     * @param int|null $hour
+     * @param int|null $minute
+     * @param int|null $second
+     * @param int|null $microsecond
+     *
+     * @return DateTime
+     */
+    public function withTimeAt(
+        int $hour = null,
+        int $minute = null,
+        int $second = null,
+        int $microsecond = null
+    ) : DateTime {
+        
+        $instance = clone $this;
+        
+        $hour        = $hour        === null ? $this->hour()        : $hour;
+        $minute      = $minute      === null ? $this->minute()      : $minute;
+        $second      = $second      === null ? $this->second()      : $second;
+        $microsecond = $microsecond === null ? $this->microsecond() : $microsecond;
+        
+        $instance->wrapped->setTime($hour, $minute, $second);
+        
+        // There is no API for setting the microsecond explicitly so a new instance has to be constructed.
+        $format            = 'Y-m-d H:i:s';
+        $value             = $instance->format($format) . '.' . substr($microsecond, 0, 6);
+        $instance->wrapped = \DateTime::createFromFormat("$format.u", $value);
+        
         return $instance;
     }
     
@@ -156,7 +248,7 @@ class DateTime implements \Serializable, \JsonSerializable
      */
     public function withTimeAtMidnight() : DateTime
     {
-        return $this->withTimeAt(0, 0, 0);
+        return $this->withTimeAt(0, 0, 0, 0);
     }
     
     
@@ -217,10 +309,9 @@ class DateTime implements \Serializable, \JsonSerializable
     public function withDateAtStartOfWeek(string $locale = null) : DateTime
     {
         $instance = $this->withTimeAtMidnight();
-        $calendar = \IntlCalendar::createInstance(null, $locale);
+        $calendar = $instance->createIntlCalendar($locale);
         
-        $calendar->setTime($instance->timestamp() * 1000);
-        $calendar->set(\IntlCalendar::FIELD_DOW_LOCAL, 1);
+        $calendar->set(IntlCalendar::FIELD_DOW_LOCAL, 1);
         
         $instance->wrapped->setTimestamp((int)($calendar->getTime() / 1000));
         
@@ -243,11 +334,11 @@ class DateTime implements \Serializable, \JsonSerializable
      * @param DateTime $other
      * @param bool     $absolute
      *
-     * @return bool|DateInterval
+     * @return DateInterval
      */
-    public function diff(DateTime $other, $absolute = false)
+    public function diff(DateTime $other, $absolute = false) : DateInterval
     {
-        return $this->wrapped->diff($other->wrapped, $absolute);
+        return DateInterval::diff($this, $other, $absolute);
     }
     
     
@@ -294,13 +385,75 @@ class DateTime implements \Serializable, \JsonSerializable
     
     
     /**
-     * The day of the month as an integer from 1-31.
+     * Alias of dayOfMonth.
      *
      * @return int
      */
     public function day() : int
     {
+        return $this->dayOfMonth();
+    }
+    
+    
+    /**
+     * The day of the year as an integer from 1-366.
+     *
+     * @return int
+     */
+    public function dayOfYear() : int
+    {
+        return $this->format('z') + 1;
+    }
+    
+    
+    /**
+     * The day of the month as an integer from 1-31.
+     *
+     * @return int
+     */
+    public function dayOfMonth() : int
+    {
         return (int)$this->format('j');
+    }
+    
+    
+    /**
+     * Returns the day of the week for the specified locale.
+     *
+     * 1 is the first day of the week, 2 the second etc. For example, for en_GB a Monday would be 1 but for en_US a
+     * Monday would be 2 as the first day of the week is Sunday in that locale.
+     *
+     * @param string|null $locale
+     *
+     * @return int
+     */
+    public function dayOfWeek(string $locale = null) : int
+    {
+        $calendar = $this->createIntlCalendar($locale);
+        
+        return (int)$calendar->get(IntlCalendar::FIELD_DOW_LOCAL);
+    }
+    
+    
+    /**
+     * Returns the ISO8601 day of the week. Monday is always 1.
+     *
+     * @return int
+     */
+    public function dayOfWeekIso() : int
+    {
+        return (int)$this->format('N');
+    }
+    
+    
+    /**
+     * The number of days in the current year. Either 365 or 366 if this is a leap year.
+     *
+     * @return int
+     */
+    public function daysInYear() : int
+    {
+        return $this->isLeapYear() ? 366 : 365;
     }
     
     
@@ -316,6 +469,19 @@ class DateTime implements \Serializable, \JsonSerializable
     
     
     /**
+     * The number of days remaining in the current year as an integer from 0 to 366.
+     *
+     * Note that this ignores the time.
+     *
+     * @return int
+     */
+    public function daysRemainingInYear() : int
+    {
+        return $this->daysInYear() - $this->dayOfYear();
+    }
+    
+    
+    /**
      * The number of days remaining in the current month as an integer from 0 - 31.
      *
      * Note that this ignores the time.
@@ -324,16 +490,81 @@ class DateTime implements \Serializable, \JsonSerializable
      */
     public function daysRemainingInMonth() : int
     {
-        return $this->daysInMonth() - $this->day();
+        return $this->daysInMonth() - $this->dayOfMonth();
     }
     
-        
+    
     /**
+     * The number of days remaining in the current week as an integer from 0 - 31.
+     *
+     * Note that this ignores the time.
+     *
+     * @param string|null $locale
+     *
+     * @return int
+     */
+    public function daysRemainingInWeek(string $locale = null) : int
+    {
+        return 7 - $this->dayOfWeek($locale);
+    }
+    
+    
+    /**
+     * @return int
+     */
+    public function hour() : int
+    {
+        return (int)$this->format('G');
+    }
+    
+    
+    /**
+     * @return int
+     */
+    public function minute() : int
+    {
+        return (int)$this->format('i');
+    }
+    
+    
+    /**
+     * @return int
+     */
+    public function second() : int
+    {
+        return (int)$this->format('s');
+    }
+    
+    
+    /**
+     * @return int
+     */
+    public function microsecond() : int
+    {
+        return (int)$this->format('u');
+    }
+    
+    
+    /**
+     * The unix timestamp.
+     *
      * @return int
      */
     public function timestamp() : int
     {
         return $this->wrapped->getTimestamp();
+    }
+    
+    
+    /**
+     * The unix timestamp in microseconds.
+     *
+     * @return int
+     */
+    public function timestampWithMicrosecond() : int
+    {
+//        return (int)($this->timestamp() . sprintf("%'.06d", $this->microsecond()));
+        return (int)($this->format('Uu'));
     }
     
     
@@ -420,6 +651,15 @@ class DateTime implements \Serializable, \JsonSerializable
     
     
     /**
+     * @return bool
+     */
+    public function isLeapYear() : bool
+    {
+        return (bool)$this->format('L');
+    }
+    
+    
+    /**
      * @param DateTime $a
      * @param DateTime $b
      *
@@ -442,7 +682,7 @@ class DateTime implements \Serializable, \JsonSerializable
     {
         $instance = clone $this;
         
-        $instance->wrapped->sub(self::resolveDateInterval($interval));
+        $instance->wrapped->sub(self::resolveDateInterval($interval)->toInternalDateInterval());
         
         return $instance;
     }
@@ -459,7 +699,7 @@ class DateTime implements \Serializable, \JsonSerializable
     {
         $instance = clone $this;
         
-        $instance->wrapped->add(self::resolveDateInterval($interval));
+        $instance->wrapped->add(self::resolveDateInterval($interval)->toInternalDateInterval());
         
         return $instance;
     }
@@ -518,11 +758,27 @@ class DateTime implements \Serializable, \JsonSerializable
      */
     private static function resolveDateInterval($interval) : DateInterval
     {
-        if (!$interval instanceof \DateInterval) {
-            // No need for any special validation here; delegate that to \DateInterval.
-            $interval = new \DateInterval($interval);
+        if (!$interval instanceof DateInterval) {
+            // No need for any special validation here; delegate that to DateInterval.
+            $interval = DateInterval::fromSpecification($interval);
         }
         
         return $interval;
+    }
+    
+    
+    /**
+     * @param string|null $locale
+     *
+     * @return IntlCalendar
+     */
+    private function createIntlCalendar(string $locale = null) : IntlCalendar
+    {
+        $timezone = IntlTimeZone::createTimeZone($this->timezone()->getName());
+        $calendar = IntlCalendar::createInstance($timezone, $locale);
+        
+        $calendar->setTime($this->timestamp() * 1000);
+        
+        return $calendar;
     }
 }

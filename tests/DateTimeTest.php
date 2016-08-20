@@ -49,6 +49,65 @@ class DateTimeTest extends \PHPUnit_Framework_TestCase
     
     
     /**
+     * @covers ::now
+     */
+    public function testCreateForCurrentDateTimeUsesMicrosecondResolution()
+    {
+        // Because "now" might happen to have been at 000000µs, we take two instances with a small 10µs sleep between
+        // them. This is still not foolproof because the time to construct $a might have taken precisely 999990µs,
+        // so we run the test up to 10 times and pass if any result provides the expected resolution. There is still
+        // the possibility of a false negative here, but it's pretty unlikely.
+        
+        
+        for ($i = 0; $i < 10; $i++) {
+            $a = DateTime::now(new \DateTimeZone('UTC'));
+            usleep(10);
+            $b = DateTime::now(new \DateTimeZone('UTC'));
+            
+            foreach ([$a, $b] as $date) {
+                if ($date->microsecond() > 0) {
+                    self::assertTrue(true);
+                    return;
+                }
+            }
+        }
+        
+        self::fail('Microsecond resolution was not captured.');
+    }
+    
+    
+    /**
+     * @covers ::now
+     */
+    public function testCreateForCurrentDateTimeAppliesTimezoneCorrectly()
+    {
+        $utc   = DateTime::now(new \DateTimeZone('UTC'));
+        $tokyo = DateTime::now(new \DateTimeZone('Asia/Tokyo'));
+        
+        // Timestamp should be the same.
+        // Within 1 second should be accurate enough.
+        $this->assertEquals($utc->timestamp(), $tokyo->timestamp(), '', 1);
+        
+        // String representations should be different.
+        // Go down to minute resolution as seconds and µs are too risky to test.
+        $format = 'Y-m-d H:i';
+        self::assertNotSame($utc->format($format), $tokyo->format($format));
+    }
+    
+    
+    /**
+     * @covers ::fromTimestampWithMicroseconds
+     */
+    public function testCreateFromTimestampWithMicroseconds()
+    {
+        $timestamp = 1471690033123456;
+        $date      = DateTime::fromTimestampWithMicroseconds($timestamp);
+        
+        self::assertSame('2016-08-20 10:47:13.123456', $date->format('Y-m-d H:i:s.u'));
+    }
+    
+    
+    /**
      * @covers ::diff
      */
     public function testDiff()
@@ -304,21 +363,61 @@ class DateTimeTest extends \PHPUnit_Framework_TestCase
         $now    = DateTime::now();
         $future = $now->add('PT1H');
         $past   = $now->subtract('PT1H');
-    
+        
         self::assertTrue($past->isInThePast());
         self::assertFalse($future->isInThePast());
-        self::assertFalse($now->isInThePast());
+        
+        // Sleep for a short time in case the above manipulations and assertions happened in the same
+        // microsecond (because PHP is that fast...).
+        usleep(10);
+        
+        self::assertTrue($now->isInThePast());
+    }
+    
+    
+    /**
+     * @covers ::timestampWithMicrosecond
+     */
+    public function testTimestampWithMicrosecond()
+    {
+        $date = DateTime::create('2015-09-15T13:46:21.123456Z');
+        
+        self::assertSame(1442324781123456, $date->timestampWithMicrosecond());
     }
     
     
     /**
      * @covers ::day
+     * @covers ::dayOfMonth
      */
     public function testDay()
     {
         $date = DateTime::create('2015-09-15T13:46:21Z');
         
         self::assertSame(15, $date->day());
+    }
+    
+    
+    /**
+     * @covers ::dayOfWeek
+     */
+    public function testDayOfWeek()
+    {
+        $date = DateTime::create('2016-08-01T00:00:00Z'); // Monday
+        
+        self::assertSame(1, $date->dayOfWeek('en_GB'));
+        self::assertSame(2, $date->dayOfWeek('en_US'));
+    }
+    
+    
+    /**
+     * @covers ::dayOfWeekIso
+     */
+    public function testDayOfWeekIso()
+    {
+        $date = DateTime::create('2016-08-01T00:00:00Z'); // Monday
+        
+        self::assertSame(1, $date->dayOfWeekIso());
     }
     
     
@@ -364,13 +463,35 @@ class DateTimeTest extends \PHPUnit_Framework_TestCase
     
     
     /**
+     * @covers ::microsecond
+     */
+    public function testMicrosecond()
+    {
+        $date = DateTime::create('2015-09-15T13:46:21.123456Z');
+        
+        self::assertSame(123456, $date->microsecond());
+    }
+    
+    
+    /**
+     * @covers ::withTimeAt
+     */
+    public function testWithTimeAt()
+    {
+        $date = DateTime::create('2015-09-15T13:46:21Z')->withTimeAt(12, 5, 42, 987654321);
+        
+        self::assertSame('2015-09-15 12:05:42.987654', $date->format('Y-m-d H:i:s.u'));
+    }
+    
+    
+    /**
      * @covers ::withTimeAtMidnight
      */
     public function testWithTimeAtMidnight()
     {
-        $date = DateTime::create('2015-09-15T13:46:21Z')->withTimeAtMidnight();
+        $date = DateTime::create('2015-09-15T13:46:21.123456Z')->withTimeAtMidnight();
         
-        self::assertSame('2015-09-15T00:00:00+00:00', $date->format('c'));
+        self::assertSame('2015-09-15 00:00:00.000000', $date->format('Y-m-d H:i:s.u'));
     }
     
     
@@ -390,9 +511,10 @@ class DateTimeTest extends \PHPUnit_Framework_TestCase
      */
     public function testWithDateAtStartOfWeek()
     {
-        $date = DateTime::create('2015-09-15T13:46:21Z')->withDateAtStartOfWeek("en_GB");
+        $date = DateTime::create('2015-09-15T13:46:21Z');
         
-        self::assertSame('2015-09-14T00:00:00+00:00', $date->format('c'));
+        self::assertSame('2015-09-14T00:00:00+00:00', $date->withDateAtStartOfWeek("en_GB")->format('c'));
+        self::assertSame('2015-09-13T00:00:00+00:00', $date->withDateAtStartOfWeek("en_US")->format('c'));
     }
     
     

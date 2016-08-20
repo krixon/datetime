@@ -74,8 +74,8 @@ class DateRangeTest extends \PHPUnit_Framework_TestCase
         
         $range1 = new DateRange($from, $until);
         $range2 = new DateRange($until, $from);
-        
-        $this->assertTrue($range1->equals($range2));
+    
+        self::assertTrue($range1->equals($range2));
     }
     
     
@@ -88,8 +88,8 @@ class DateRangeTest extends \PHPUnit_Framework_TestCase
         $until = DateTime::now()->add('PT1M');
         
         $range = new DateRange($from, $until);
-        
-        $this->assertTrue($range->containsNow());
+    
+        self::assertTrue($range->containsNow());
     }
     
     
