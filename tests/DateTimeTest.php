@@ -281,6 +281,9 @@ class DateTimeTest extends \PHPUnit_Framework_TestCase
     }
     
     
+    /**
+     * @covers ::isInTheFuture
+     */
     public function testIsInTheFuture()
     {
         $now    = DateTime::now();
@@ -293,6 +296,9 @@ class DateTimeTest extends \PHPUnit_Framework_TestCase
     }
     
     
+    /**
+     * @covers ::isInThePast
+     */
     public function testIsInThePast()
     {
         $now    = DateTime::now();
@@ -302,6 +308,58 @@ class DateTimeTest extends \PHPUnit_Framework_TestCase
         self::assertTrue($past->isInThePast());
         self::assertFalse($future->isInThePast());
         self::assertFalse($now->isInThePast());
+    }
+    
+    
+    /**
+     * @covers ::day
+     */
+    public function testDay()
+    {
+        $date = DateTime::create('2015-09-15T13:46:21Z');
+        
+        self::assertSame(15, $date->day());
+    }
+    
+    
+    /**
+     * @covers ::daysInMonth
+     */
+    public function testDaysInMonth()
+    {
+        $expected = [
+            1  => 31,
+            2  => 28,
+            3  => 31,
+            4  => 30,
+            5  => 31,
+            6  => 30,
+            7  => 31,
+            8  => 31,
+            9  => 30,
+            10 => 31,
+            11 => 30,
+            12 => 31,
+        ];
+        
+        foreach ($expected as $month => $days) {
+            $date = DateTime::fromFormat('Y-n-d', sprintf('2015-%d-01', $month));
+            self::assertSame($days, $date->daysInMonth());
+        }
+        
+        // Ensure Feb is correct in leap years.
+        self::assertSame(29, DateTime::fromFormat('Y-m-d', '2016-02-01')->daysInMonth());
+    }
+    
+    
+    /**
+     * @covers ::daysRemainingInMonth
+     */
+    public function testDaysRemainingInMonth()
+    {
+        $date = DateTime::create('2015-09-15T13:46:21Z');
+        
+        self::assertSame(15, $date->daysRemainingInMonth());
     }
     
     

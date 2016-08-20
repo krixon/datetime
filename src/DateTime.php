@@ -95,6 +95,23 @@ class DateTime implements \Serializable, \JsonSerializable
     
     
     /**
+     * Creates a new instance from an internal \DateTime object.
+     *
+     * @param \DateTime $date
+     *
+     * @return static
+     */
+    public static function fromInternalDateTime(\DateTime $date)
+    {
+        $instance = new static;
+        
+        $instance->wrapped = clone $date;
+        
+        return $instance;
+    }
+    
+    
+    /**
      * Returns a new instance with the time set accordingly.
      *
      * @param int $hour
@@ -212,6 +229,17 @@ class DateTime implements \Serializable, \JsonSerializable
     
     
     /**
+     * Returns an internal, mutable \DateTime object with the same value as this instance.
+     *
+     * @return \DateTime
+     */
+    public function toInternalDateTime() : \DateTime
+    {
+        return clone $this->wrapped;
+    }
+    
+    
+    /**
      * @param DateTime $other
      * @param bool     $absolute
      *
@@ -228,7 +256,7 @@ class DateTime implements \Serializable, \JsonSerializable
      *
      * @return string
      */
-    public function format($format)
+    public function format($format) : string
     {
         return $this->wrapped->format($format);
     }
@@ -237,7 +265,7 @@ class DateTime implements \Serializable, \JsonSerializable
     /**
      * @return int
      */
-    public function offset()
+    public function offset() : int
     {
         return $this->wrapped->getOffset();
     }
@@ -286,20 +314,33 @@ class DateTime implements \Serializable, \JsonSerializable
         return (int)$this->format('t');
     }
     
+    
+    /**
+     * The number of days remaining in the current month as an integer from 0 - 31.
+     *
+     * Note that this ignores the time.
+     *
+     * @return int
+     */
+    public function daysRemainingInMonth() : int
+    {
+        return $this->daysInMonth() - $this->day();
+    }
+    
         
     /**
      * @return int
      */
-    public function timestamp()
+    public function timestamp() : int
     {
         return $this->wrapped->getTimestamp();
     }
     
     
     /**
-     * @return \DateTimeZone
+     * @return DateTimeZone
      */
-    public function timezone()
+    public function timezone() : DateTimeZone
     {
         return $this->wrapped->getTimezone();
     }
@@ -310,7 +351,7 @@ class DateTime implements \Serializable, \JsonSerializable
      *
      * @return bool
      */
-    public function equals(DateTime $other)
+    public function equals(DateTime $other) : bool
     {
         return $this->wrapped == $other->wrapped;
     }
@@ -321,7 +362,7 @@ class DateTime implements \Serializable, \JsonSerializable
      *
      * @return bool
      */
-    public function isLaterThan(DateTime $other)
+    public function isLaterThan(DateTime $other) : bool
     {
         return static::compare($this, $other) === 1;
     }
@@ -332,7 +373,7 @@ class DateTime implements \Serializable, \JsonSerializable
      *
      * @return bool
      */
-    public function isLaterThanOrEqualTo(DateTime $other)
+    public function isLaterThanOrEqualTo(DateTime $other) : bool
     {
         return static::compare($this, $other) >= 0;
     }
@@ -343,7 +384,7 @@ class DateTime implements \Serializable, \JsonSerializable
      *
      * @return bool
      */
-    public function isEarlierThan(DateTime $other)
+    public function isEarlierThan(DateTime $other) : bool
     {
         return static::compare($this, $other) === -1;
     }
@@ -354,7 +395,7 @@ class DateTime implements \Serializable, \JsonSerializable
      *
      * @return bool
      */
-    public function isEarlierThanOrEqualTo(DateTime $other)
+    public function isEarlierThanOrEqualTo(DateTime $other) : bool
     {
         return static::compare($this, $other) <= 0;
     }
@@ -384,18 +425,20 @@ class DateTime implements \Serializable, \JsonSerializable
      *
      * @return int
      */
-    public static function compare(DateTime $a, DateTime $b)
+    public static function compare(DateTime $a, DateTime $b) : int
     {
         return $a->wrapped <=> $b->wrapped;
     }
     
     
     /**
+     * Creates a new instance with the interval subtracted from it.
+     *
      * @param DateInterval|string $interval A DateInterval instance or a DateInterval spec as a string.
      *
      * @return DateTime
      */
-    public function subtract($interval)
+    public function subtract($interval) : DateTime
     {
         $instance = clone $this;
         
@@ -406,15 +449,36 @@ class DateTime implements \Serializable, \JsonSerializable
     
     
     /**
+     * Creates a new instance with the interval added to it.
+     *
      * @param DateInterval|string $interval A DateInterval instance or a DateInterval spec as a string.
      *
      * @return DateTime
      */
-    public function add($interval)
+    public function add($interval) : DateTime
     {
         $instance = clone $this;
         
         $instance->wrapped->add(self::resolveDateInterval($interval));
+        
+        return $instance;
+    }
+    
+    
+    /**
+     * Creates a new instance modified according to the specification.
+     *
+     * For valid formats @see http://php.net/manual/en/datetime.formats.relative.php
+     *
+     * @param string $specification
+     *
+     * @return DateTime
+     */
+    public function modify(string $specification) : DateTime
+    {
+        $instance = clone $this;
+        
+        $instance->wrapped->modify($specification);
         
         return $instance;
     }
