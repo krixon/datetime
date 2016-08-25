@@ -309,7 +309,7 @@ class DateTime implements \Serializable, \JsonSerializable
     public function withDateAtStartOfWeek(string $locale = null) : DateTime
     {
         $instance = $this->withTimeAtMidnight();
-        $calendar = $instance->createIntlCalendar($locale);
+        $calendar = $instance->toIntlCalendar($locale);
         
         $calendar->set(IntlCalendar::FIELD_DOW_LOCAL, 1);
         
@@ -327,6 +327,24 @@ class DateTime implements \Serializable, \JsonSerializable
     public function toInternalDateTime() : \DateTime
     {
         return clone $this->wrapped;
+    }
+    
+    
+    /**
+     * Returns an IntlCalendar instance set to the datetime represented by this instance.
+     *
+     * @param string|null $locale
+     *
+     * @return IntlCalendar
+     */
+    public function toIntlCalendar(string $locale = null) : IntlCalendar
+    {
+        $timezone = IntlTimeZone::createTimeZone($this->timezone()->getName());
+        $calendar = IntlCalendar::createInstance($timezone, $locale);
+        
+        $calendar->setTime($this->timestampWithMicrosecond());
+        
+        return $calendar;
     }
     
     
@@ -429,7 +447,7 @@ class DateTime implements \Serializable, \JsonSerializable
      */
     public function dayOfWeek(string $locale = null) : int
     {
-        $calendar = $this->createIntlCalendar($locale);
+        $calendar = $this->toIntlCalendar($locale);
         
         return (int)$calendar->get(IntlCalendar::FIELD_DOW_LOCAL);
     }
@@ -563,7 +581,6 @@ class DateTime implements \Serializable, \JsonSerializable
      */
     public function timestampWithMicrosecond() : int
     {
-//        return (int)($this->timestamp() . sprintf("%'.06d", $this->microsecond()));
         return (int)($this->format('Uu'));
     }
     
@@ -764,21 +781,5 @@ class DateTime implements \Serializable, \JsonSerializable
         }
         
         return $interval;
-    }
-    
-    
-    /**
-     * @param string|null $locale
-     *
-     * @return IntlCalendar
-     */
-    private function createIntlCalendar(string $locale = null) : IntlCalendar
-    {
-        $timezone = IntlTimeZone::createTimeZone($this->timezone()->getName());
-        $calendar = IntlCalendar::createInstance($timezone, $locale);
-        
-        $calendar->setTime($this->timestamp() * 1000);
-        
-        return $calendar;
     }
 }
