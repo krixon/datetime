@@ -110,6 +110,19 @@ class DateTime implements \Serializable, \JsonSerializable
     
     
     /**
+     * Creates a new instance from a millisecond-precision unix timestamp.
+     *
+     * @param int $timestamp
+     *
+     * @return DateTime
+     */
+    public static function fromTimestampWithMilliseconds(int $timestamp) : DateTime
+    {
+        return static::fromTimestampWithMicroseconds($timestamp * 1000);
+    }
+    
+    
+    /**
      * Creates a new instance from a microsecond-precision unix timestamp.
      *
      * @param int $timestamp
@@ -130,15 +143,28 @@ class DateTime implements \Serializable, \JsonSerializable
      *
      * @param \DateTime $date
      *
-     * @return static
+     * @return DateTime
      */
-    public static function fromInternalDateTime(\DateTime $date)
+    public static function fromInternalDateTime(\DateTime $date) : DateTime
     {
         $instance = new static;
         
         $instance->wrapped = clone $date;
         
         return $instance;
+    }
+    
+    
+    /**
+     * Creates a new instance from an internal \DateTime object.
+     *
+     * @param IntlCalendar $calendar
+     *
+     * @return DateTime
+     */
+    public static function fromIntlCalendar(IntlCalendar $calendar) : DateTime
+    {
+        return static::fromTimestampWithMilliseconds($calendar->getTime());
     }
     
     
@@ -342,7 +368,7 @@ class DateTime implements \Serializable, \JsonSerializable
         $timezone = IntlTimeZone::createTimeZone($this->timezone()->getName());
         $calendar = IntlCalendar::createInstance($timezone, $locale);
         
-        $calendar->setTime($this->timestampWithMicrosecond());
+        $calendar->setTime($this->timestampWithMillisecond());
         
         return $calendar;
     }
@@ -575,7 +601,18 @@ class DateTime implements \Serializable, \JsonSerializable
     
     
     /**
-     * The unix timestamp in microseconds.
+     * The unix timestamp in milliseconds (1/1000s).
+     *
+     * @return int
+     */
+    public function timestampWithMillisecond() : int
+    {
+        return (int)($this->timestampWithMicrosecond() / 1000);
+    }
+    
+    
+    /**
+     * The unix timestamp in microseconds (1/1000000s).
      *
      * @return int
      */

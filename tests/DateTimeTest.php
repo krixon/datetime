@@ -96,6 +96,18 @@ class DateTimeTest extends \PHPUnit_Framework_TestCase
     
     
     /**
+     * @covers ::fromTimestampWithMilliseconds
+     */
+    public function testCreateFromTimestampWithMilliseconds()
+    {
+        $timestamp = 1471690033123;
+        $date      = DateTime::fromTimestampWithMilliseconds($timestamp);
+        
+        self::assertSame('2016-08-20 10:47:13.123000', $date->format('Y-m-d H:i:s.u'));
+    }
+    
+    
+    /**
      * @covers ::fromTimestampWithMicroseconds
      */
     public function testCreateFromTimestampWithMicroseconds()
@@ -104,6 +116,21 @@ class DateTimeTest extends \PHPUnit_Framework_TestCase
         $date      = DateTime::fromTimestampWithMicroseconds($timestamp);
         
         self::assertSame('2016-08-20 10:47:13.123456', $date->format('Y-m-d H:i:s.u'));
+    }
+    
+    
+    /**
+     * @covers ::fromIntlCalendar
+     */
+    public function testCreateFromIntlCalendar()
+    {
+        $calendar = \IntlCalendar::createInstance();
+        
+        $calendar->setTime(1471690033123);
+        
+        $date = DateTime::fromIntlCalendar($calendar);
+        
+        self::assertSame('2016-08-20 10:47:13.123000', $date->format('Y-m-d H:i:s.u'));
     }
     
     
@@ -372,6 +399,17 @@ class DateTimeTest extends \PHPUnit_Framework_TestCase
         usleep(10);
         
         self::assertTrue($now->isInThePast());
+    }
+    
+    
+    /**
+     * @covers ::timestampWithMillisecond
+     */
+    public function testTimestampWithMillisecond()
+    {
+        $date = DateTime::create('2015-09-15T13:46:21.123456Z');
+        
+        self::assertSame(1442324781123, $date->timestampWithMillisecond());
     }
     
     
