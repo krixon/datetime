@@ -50,48 +50,26 @@ class DateIntervalTest extends \PHPUnit_Framework_TestCase
      *
      * @param string $a
      * @param string $b
-     * @param int    $y
-     * @param int    $m
-     * @param int    $d
-     * @param int    $td
-     * @param int    $h
-     * @param int    $i
-     * @param int    $s
-     * @param int    $us
+     * @param string $expected
      * @param bool   $abs
      */
-    public function testDiff(
-        string $a,
-        string $b,
-        int $y,
-        int $m,
-        int $d,
-        int $td,
-        int $h,
-        int $i,
-        int $s,
-        int $us,
-        bool $abs = false
-    ) {
+    public function testDiff(string $a, string $b, string $expected, bool $abs = false)
+    {
         $a    = DateTime::create($a);
         $b    = DateTime::create($b);
         $diff = DateInterval::diff($a, $b, $abs);
-        
-        self::assertSame($y, $diff->years());
-        self::assertSame($m, $diff->months());
-        self::assertSame($d, $diff->days());
-        self::assertSame($td, $diff->totalDays());
-        self::assertSame($h, $diff->hours());
-        self::assertSame($i, $diff->minutes());
-        self::assertSame($s, $diff->seconds());
-        self::assertSame($us, $diff->microseconds());
+    
+        self::assertSame(
+            $expected,
+            $diff->format('%yy %mm %dd %hh %im %ss %uµs %atd')
+        );
     }
     
     
     public function diffProvider() : array
     {
         return [
-            ['2015-01-01T00:00:00.000000', '2016-02-03T04:05:06.123456', 1, 1, 2, 398, 4, 5, 6, 123456],
+            ['2015-01-01T00:00:00.000000', '2016-02-03T04:05:06.123456', '1y 1m 2d 4h 5m 6s 123456µs 398td'],
         ];
     }
 }
