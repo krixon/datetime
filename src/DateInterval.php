@@ -201,6 +201,25 @@ class DateInterval
     
     
     /**
+     * @param DateInterval $other
+     *
+     * @return bool
+     */
+    public function equals(self $other) : bool
+    {
+        return
+            $this->wrapped->y     == $other->wrapped->y &&
+            $this->wrapped->m     == $other->wrapped->m &&
+            $this->wrapped->d     == $other->wrapped->d &&
+            $this->wrapped->h     == $other->wrapped->h &&
+            $this->wrapped->i     == $other->wrapped->i &&
+            $this->wrapped->s     == $other->wrapped->s &&
+            $this->wrapped->days  == $other->wrapped->days &&
+            $this->microseconds   == $other->microseconds;
+    }
+    
+    
+    /**
      * In addition to the regular \DateInterval formats, this also supports %u for microseconds.
      *
      * @param string $format

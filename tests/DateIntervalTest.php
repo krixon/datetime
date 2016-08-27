@@ -45,6 +45,36 @@ class DateIntervalTest extends \PHPUnit_Framework_TestCase
     
     
     /**
+     * @dataProvider equalsProvider
+     * @covers ::equals
+     *
+     * @param string $a
+     * @param string $b
+     * @param bool   $expected
+     */
+    public function testEquals(string $a, string $b, bool $expected)
+    {
+        $a = DateInterval::fromSpecification($a);
+        $b = DateInterval::fromSpecification($b);
+    
+        self::assertSame($expected, $a->equals($b));
+    }
+    
+    
+    /**
+     * @return array
+     */
+    public function equalsProvider() : array
+    {
+        return [
+            ['P1Y1M1DT1H1M1S1U', 'P1Y1M1DT1H1M1S1U', true],
+            ['P1Y1M1DT1H1M1S1U', 'P1Y1M1DT1H1M1S2U', false],
+            ['P1Y1M1DT1H1M1S1U', 'P2Y1M1DT1H1M1S1U', false],
+        ];
+    }
+    
+    
+    /**
      * @dataProvider diffProvider
      * @covers ::diff
      *
