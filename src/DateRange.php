@@ -72,7 +72,7 @@ class DateRange
      */
     public function diff() : DateInterval
     {
-        return clone $this->fullDiff();
+        return $this->fullDiff();
     }
     
     
