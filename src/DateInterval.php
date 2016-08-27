@@ -104,7 +104,7 @@ class DateInterval
      */
     public static function diff(DateTime $a, DateTime $b, bool $absolute = false) : self
     {
-        $microseconds = $a->microsecond() - $b->microsecond();
+        $microseconds = $b->microsecond() - $a->microsecond();
         
         if ($absolute) {
             $microseconds = abs($microseconds);
