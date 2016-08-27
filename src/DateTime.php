@@ -52,9 +52,9 @@ class DateTime implements \Serializable, \JsonSerializable
      * @param string            $time
      * @param DateTimeZone|null $timezone
      *
-     * @return DateTime
+     * @return self
      */
-    public static function create($time = 'now', DateTimeZone $timezone = null) : DateTime
+    public static function create($time = 'now', DateTimeZone $timezone = null) : self
     {
         return new static($time, $timezone);
     }
@@ -63,9 +63,9 @@ class DateTime implements \Serializable, \JsonSerializable
     /**
      * @param DateTimeZone|null $timezone
      *
-     * @return DateTime
+     * @return self
      */
-    public static function now(DateTimeZone $timezone = null) : DateTime
+    public static function now(DateTimeZone $timezone = null) : self
     {
         // Ensure microsecond precision.
         
@@ -90,9 +90,9 @@ class DateTime implements \Serializable, \JsonSerializable
      * @param mixed             $time
      * @param DateTimeZone|null $timezone
      *
-     * @return DateTime
+     * @return self
      */
-    public static function fromFormat(string $format, $time, DateTimeZone $timezone = null) : DateTime
+    public static function fromFormat(string $format, $time, DateTimeZone $timezone = null) : self
     {
         return new static($time, $timezone, $format);
     }
@@ -101,9 +101,9 @@ class DateTime implements \Serializable, \JsonSerializable
     /**
      * @param int $timestamp
      *
-     * @return DateTime
+     * @return self
      */
-    public static function fromTimestamp(int $timestamp) : DateTime
+    public static function fromTimestamp(int $timestamp) : self
     {
         return new static("@$timestamp");
     }
@@ -114,9 +114,9 @@ class DateTime implements \Serializable, \JsonSerializable
      *
      * @param int $timestamp
      *
-     * @return DateTime
+     * @return self
      */
-    public static function fromTimestampWithMilliseconds(int $timestamp) : DateTime
+    public static function fromTimestampWithMilliseconds(int $timestamp) : self
     {
         return static::fromTimestampWithMicroseconds($timestamp * 1000);
     }
@@ -127,9 +127,9 @@ class DateTime implements \Serializable, \JsonSerializable
      *
      * @param int $timestamp
      *
-     * @return DateTime
+     * @return self
      */
-    public static function fromTimestampWithMicroseconds(int $timestamp) : DateTime
+    public static function fromTimestampWithMicroseconds(int $timestamp) : self
     {
         $seconds      = (int)($timestamp / 10 ** 6);
         $microseconds = $timestamp - ($seconds * 10 ** 6);
@@ -143,9 +143,9 @@ class DateTime implements \Serializable, \JsonSerializable
      *
      * @param \DateTime $date
      *
-     * @return DateTime
+     * @return self
      */
-    public static function fromInternalDateTime(\DateTime $date) : DateTime
+    public static function fromInternalDateTime(\DateTime $date) : self
     {
         $instance = new static;
         
@@ -160,9 +160,9 @@ class DateTime implements \Serializable, \JsonSerializable
      *
      * @param IntlCalendar $calendar
      *
-     * @return DateTime
+     * @return self
      */
-    public static function fromIntlCalendar(IntlCalendar $calendar) : DateTime
+    public static function fromIntlCalendar(IntlCalendar $calendar) : self
     {
         return static::fromTimestampWithMilliseconds($calendar->getTime());
     }
@@ -177,9 +177,9 @@ class DateTime implements \Serializable, \JsonSerializable
      * @param int $month
      * @param int $day
      *
-     * @return DateTime
+     * @return self
      */
-    public function withDateAt(int $year = null, int $month = null, int $day = null) : DateTime
+    public function withDateAt(int $year = null, int $month = null, int $day = null) : self
     {
         if (null === $year && null === $month && null === $day) {
             return $this;
@@ -200,9 +200,9 @@ class DateTime implements \Serializable, \JsonSerializable
     /**
      * @param int $year
      *
-     * @return DateTime
+     * @return self
      */
-    public function withYear(int $year) : DateTime
+    public function withYear(int $year) : self
     {
         return $this->withDateAt($year);
     }
@@ -211,9 +211,9 @@ class DateTime implements \Serializable, \JsonSerializable
     /**
      * @param int $month
      *
-     * @return DateTime
+     * @return self
      */
-    public function withMonth(int $month) : DateTime
+    public function withMonth(int $month) : self
     {
         return $this->withDateAt(null, $month);
     }
@@ -222,9 +222,9 @@ class DateTime implements \Serializable, \JsonSerializable
     /**
      * @param int $day
      *
-     * @return DateTime
+     * @return self
      */
-    public function withDay(int $day) : DateTime
+    public function withDay(int $day) : self
     {
         return $this->withDateAt(null, null, $day);
     }
@@ -240,14 +240,14 @@ class DateTime implements \Serializable, \JsonSerializable
      * @param int|null $second
      * @param int|null $microsecond
      *
-     * @return DateTime
+     * @return self
      */
     public function withTimeAt(
         int $hour = null,
         int $minute = null,
         int $second = null,
         int $microsecond = null
-    ) : DateTime {
+    ) : self {
         
         $instance = clone $this;
         
@@ -270,9 +270,9 @@ class DateTime implements \Serializable, \JsonSerializable
     /**
      * Returns a new instance with the time set to midnight.
      *
-     * @return DateTime
+     * @return self
      */
-    public function withTimeAtMidnight() : DateTime
+    public function withTimeAtMidnight() : self
     {
         return $this->withTimeAt(0, 0, 0, 0);
     }
@@ -281,9 +281,9 @@ class DateTime implements \Serializable, \JsonSerializable
     /**
      * Returns a new instance with the date set to 1st of Jan in the current year and time set to midnight.
      *
-     * @return DateTime
+     * @return self
      */
-    public function withDateAtStartOfYear() : DateTime
+    public function withDateAtStartOfYear() : self
     {
         $instance = $this->withTimeAtMidnight();
         
@@ -296,9 +296,9 @@ class DateTime implements \Serializable, \JsonSerializable
     /**
      * Returns a new instance with the date set to 1st of the current month and time set to midnight.
      *
-     * @return DateTime
+     * @return self
      */
-    public function withDateAtStartOfMonth() : DateTime
+    public function withDateAtStartOfMonth() : self
     {
         $instance = $this->withTimeAtMidnight();
         
@@ -311,9 +311,9 @@ class DateTime implements \Serializable, \JsonSerializable
     /**
      * Returns a new instance with the date set to last day of the current month and time set to midnight.
      *
-     * @return DateTime
+     * @return self
      */
-    public function withDateAtEndOfMonth() : DateTime
+    public function withDateAtEndOfMonth() : self
     {
         $instance = $this->withDateAtStartOfMonth();
         
@@ -330,9 +330,9 @@ class DateTime implements \Serializable, \JsonSerializable
      * @param string|null $locale The locale with which to determine the week start day. If not set the default locale
      *                            will be used.
      *
-     * @return DateTime
+     * @return self
      */
-    public function withDateAtStartOfWeek(string $locale = null) : DateTime
+    public function withDateAtStartOfWeek(string $locale = null) : self
     {
         $instance = $this->withTimeAtMidnight();
         $calendar = $instance->toIntlCalendar($locale);
@@ -375,12 +375,12 @@ class DateTime implements \Serializable, \JsonSerializable
     
     
     /**
-     * @param DateTime $other
-     * @param bool     $absolute
+     * @param self $other
+     * @param bool $absolute
      *
      * @return DateInterval
      */
-    public function diff(DateTime $other, $absolute = false) : DateInterval
+    public function diff(self $other, $absolute = false) : DateInterval
     {
         return DateInterval::diff($this, $other, $absolute);
     }
@@ -632,55 +632,55 @@ class DateTime implements \Serializable, \JsonSerializable
     
     
     /**
-     * @param DateTime $other
+     * @param self $other
      *
      * @return bool
      */
-    public function equals(DateTime $other) : bool
+    public function equals(self $other) : bool
     {
         return $this->wrapped == $other->wrapped;
     }
     
     
     /**
-     * @param DateTime $other
+     * @param self $other
      *
      * @return bool
      */
-    public function isLaterThan(DateTime $other) : bool
+    public function isLaterThan(self $other) : bool
     {
         return static::compare($this, $other) === 1;
     }
     
     
     /**
-     * @param DateTime $other
+     * @param self $other
      *
      * @return bool
      */
-    public function isLaterThanOrEqualTo(DateTime $other) : bool
+    public function isLaterThanOrEqualTo(self $other) : bool
     {
         return static::compare($this, $other) >= 0;
     }
     
     
     /**
-     * @param DateTime $other
+     * @param self $other
      *
      * @return bool
      */
-    public function isEarlierThan(DateTime $other) : bool
+    public function isEarlierThan(self $other) : bool
     {
         return static::compare($this, $other) === -1;
     }
     
     
     /**
-     * @param DateTime $other
+     * @param self $other
      *
      * @return bool
      */
-    public function isEarlierThanOrEqualTo(DateTime $other) : bool
+    public function isEarlierThanOrEqualTo(self $other) : bool
     {
         return static::compare($this, $other) <= 0;
     }
@@ -714,12 +714,12 @@ class DateTime implements \Serializable, \JsonSerializable
     
     
     /**
-     * @param DateTime $a
-     * @param DateTime $b
+     * @param self $a
+     * @param self $b
      *
      * @return int
      */
-    public static function compare(DateTime $a, DateTime $b) : int
+    public static function compare(self $a, self $b) : int
     {
         return $a->wrapped <=> $b->wrapped;
     }
@@ -730,9 +730,9 @@ class DateTime implements \Serializable, \JsonSerializable
      *
      * @param DateInterval|string $interval A DateInterval instance or a DateInterval spec as a string.
      *
-     * @return DateTime
+     * @return self
      */
-    public function subtract($interval) : DateTime
+    public function subtract($interval) : self
     {
         $instance = clone $this;
         
@@ -747,9 +747,9 @@ class DateTime implements \Serializable, \JsonSerializable
      *
      * @param DateInterval|string $interval A DateInterval instance or a DateInterval spec as a string.
      *
-     * @return DateTime
+     * @return self
      */
-    public function add($interval) : DateTime
+    public function add($interval) : self
     {
         $instance = clone $this;
         
@@ -766,9 +766,9 @@ class DateTime implements \Serializable, \JsonSerializable
      *
      * @param string $specification
      *
-     * @return DateTime
+     * @return self
      */
-    public function modify(string $specification) : DateTime
+    public function modify(string $specification) : self
     {
         $instance = clone $this;
         

@@ -55,9 +55,9 @@ class DateInterval
      *
      * @param string $specification
      *
-     * @return DateInterval
+     * @return self
      */
-    public static function fromSpecification(string $specification) : DateInterval
+    public static function fromSpecification(string $specification) : self
     {
         $microseconds = 0;
         
@@ -100,9 +100,9 @@ class DateInterval
      * @param DateTime $b
      * @param bool     $absolute
      *
-     * @return DateInterval
+     * @return self
      */
-    public static function diff(DateTime $a, DateTime $b, bool $absolute = false) : DateInterval
+    public static function diff(DateTime $a, DateTime $b, bool $absolute = false) : self
     {
         $microseconds = $a->microsecond() - $b->microsecond();
         
@@ -128,7 +128,7 @@ class DateInterval
      * @param int|null $seconds
      * @param int|null $microseconds
      *
-     * @return DateInterval
+     * @return self
      */
     public static function fromComponents(
         int $years = null,
@@ -139,7 +139,7 @@ class DateInterval
         int $minutes = null,
         int $seconds = null,
         int $microseconds = null
-    ) : DateInterval {
+    ) : self {
         if (!($years || $months || $weeks || $days || $hours || $minutes || $seconds || $microseconds)) {
             throw new \InvalidArgumentException('At least one component is required.');
         }

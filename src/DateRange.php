@@ -83,7 +83,7 @@ class DateRange
      *
      * @return bool
      */
-    public function contains(DateTime $dateTime)
+    public function contains(DateTime $dateTime) : bool
     {
         return $this->from->isEarlierThanOrEqualTo($dateTime) && $this->until->isLaterThan($dateTime);
     }
@@ -103,11 +103,11 @@ class DateRange
     /**
      * Determines if an instance is equal to this instance.
      *
-     * @param DateRange $other
+     * @param self $other
      *
      * @return bool
      */
-    public function equals(DateRange $other) : bool
+    public function equals(self $other) : bool
     {
         if ($other === $this) {
             return true;
@@ -124,7 +124,7 @@ class DateRange
      */
     public function totalYears() : int
     {
-        return $this->dateDiff()->y;
+        return $this->dateDiff()->years();
     }
     
     
@@ -135,7 +135,7 @@ class DateRange
      */
     public function totalMonths() : int
     {
-        return ($this->totalYears() * 12) + $this->dateDiff()->m;
+        return ($this->totalYears() * 12) + $this->dateDiff()->months();
     }
     
     
