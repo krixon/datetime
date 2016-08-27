@@ -2,6 +2,7 @@
 
 namespace Krixon\DateTime\Test;
 
+use Krixon\DateTime\DateInterval;
 use Krixon\DateTime\DateRange;
 use Krixon\DateTime\DateTime;
 
@@ -12,6 +13,65 @@ use Krixon\DateTime\DateTime;
  */
 class DateRangeTest extends \PHPUnit_Framework_TestCase
 {
+    /**
+     * @covers ::from
+     */
+    public function testFrom()
+    {
+        $from  = DateTime::create('2015-01-01T00:00:00Z');
+        $until = DateTime::create('2016-01-01T00:00:00Z');
+        $range = new DateRange($from, $until);
+        
+        self::assertTrue($from->equals($range->from()));
+    }
+    
+    
+    /**
+     * @covers ::until
+     */
+    public function testUntil()
+    {
+        $from  = DateTime::create('2015-01-01T00:00:00Z');
+        $until = DateTime::create('2016-01-01T00:00:00Z');
+        $range = new DateRange($from, $until);
+        
+        self::assertTrue($until->equals($range->until()));
+    }
+    
+    
+    /**
+     * @covers ::equals
+     */
+    public function testEquals()
+    {
+        $from  = DateTime::create('2015-01-01T00:00:00Z');
+        $until = DateTime::create('2016-01-01T00:00:00Z');
+        $a     = new DateRange($from, $until);
+        $b     = new DateRange($from, $until);
+        $c     = new DateRange($from->subtract('PT1H'), $until);
+        
+        self::assertTrue($a->equals($a));
+        self::assertTrue($a->equals($b));
+        self::assertFalse($a->equals($c));
+    }
+    
+    
+    /**
+     * @covers ::diff
+     */
+    public function testDiff()
+    {
+        $from  = DateTime::create('2015-01-01T00:00:00.000000');
+        $until = DateTime::create('2016-02-03T04:05:06.123456');
+        $range = new DateRange($from, $until);
+        
+        $rangeDiff  = $range->diff();
+        $manualDiff = DateInterval::diff($from, $until);
+        
+        self::assertTrue($manualDiff->equals($rangeDiff));
+    }
+    
+    
     /**
      * @dataProvider containsDateTimeProvider
      * @covers ::contains
@@ -94,29 +154,123 @@ class DateRangeTest extends \PHPUnit_Framework_TestCase
     
     
     /**
+     * @dataProvider totalDaysProvider
      * @covers ::totalDays
+     *
+     * @param string $from
+     * @param string $until
+     * @param int    $expected
      */
-    public function testTotalDays()
+    public function testTotalDays(string $from, string $until, int $expected)
     {
-        $from  = DateTime::create('2016-01-01T00:00:00Z');
-        $until = DateTime::create('2015-01-01T00:00:00Z');
+        $from  = DateTime::create($from);
+        $until = DateTime::create($until);
         
         $range = new DateRange($from, $until);
         
-        self::assertSame(365, $range->totalDays());
+        self::assertSame($expected, $range->totalDays());
+    }
+    
+    
+    public function totalDaysProvider() : array
+    {
+        return [
+            ['2015-01-01T00:00:00Z', '2016-01-01T00:00:00Z', 365],
+            ['2016-01-01T00:00:00Z', '2017-01-01T00:00:00Z', 366],
+            ['2015-02-01T00:00:00Z', '2015-03-01T00:00:00Z', 28],
+            ['2016-02-01T00:00:00Z', '2016-03-01T00:00:00Z', 29],
+        ];
     }
     
     
     /**
+     * @dataProvider totalWeeksProvider
      * @covers ::totalWeeks
+     *
+     * @param string $from
+     * @param string $until
+     * @param int    $expected
      */
-    public function testTotalWeeks()
+    public function testTotalWeeks(string $from, string $until, int $expected)
     {
-        $from  = DateTime::create('2016-01-01T00:00:00Z');
-        $until = DateTime::create('2015-01-01T00:00:00Z');
+        $from  = DateTime::create($from);
+        $until = DateTime::create($until);
         
         $range = new DateRange($from, $until);
         
-        self::assertSame(52, $range->totalWeeks());
+        self::assertSame($expected, $range->totalWeeks());
+    }
+    
+    
+    public function totalWeeksProvider() : array
+    {
+        return [
+            ['2015-01-01T00:00:00Z', '2016-01-01T00:00:00Z', 52],
+            ['2016-01-01T00:00:00Z', '2017-01-01T00:00:00Z', 52],
+            ['2015-02-01T00:00:00Z', '2015-03-01T00:00:00Z', 4],
+            ['2015-02-01T00:00:00Z', '2015-03-07T00:00:00Z', 4],
+            ['2016-02-01T00:00:00Z', '2016-03-07T00:00:00Z', 5],
+        ];
+    }
+    
+    
+    /**
+     * @dataProvider totalMonthsProvider
+     * @covers ::totalMonths
+     *
+     * @param string $from
+     * @param string $until
+     * @param int    $expected
+     */
+    public function testTotalMonths(string $from, string $until, int $expected)
+    {
+        $from  = DateTime::create($from);
+        $until = DateTime::create($until);
+        
+        $range = new DateRange($from, $until);
+        
+        self::assertSame($expected, $range->totalMonths());
+    }
+    
+    
+    public function totalMonthsProvider() : array
+    {
+        return [
+            ['2015-01-01T00:00:00Z', '2016-01-01T00:00:00Z', 12],
+            ['2016-01-01T00:00:00Z', '2017-01-01T00:00:00Z', 12],
+            ['2015-02-01T00:00:00Z', '2015-03-01T00:00:00Z', 1],
+            ['2016-02-01T00:00:00Z', '2016-03-01T00:00:00Z', 1],
+            ['2010-01-01T00:00:00Z', '2014-01-01T00:00:00Z', 48],
+        ];
+    }
+    
+    
+    /**
+     * @dataProvider totalYearsProvider
+     * @covers ::totalYears
+     *
+     * @param string $from
+     * @param string $until
+     * @param int    $expected
+     */
+    public function testTotalYears(string $from, string $until, int $expected)
+    {
+        $from  = DateTime::create($from);
+        $until = DateTime::create($until);
+        
+        $range = new DateRange($from, $until);
+        
+        self::assertSame($expected, $range->totalYears());
+    }
+    
+    
+    public function totalYearsProvider() : array
+    {
+        return [
+            ['2015-01-01T00:00:00Z', '2016-01-01T00:00:00Z', 1],
+            ['2016-01-01T00:00:00Z', '2017-01-01T00:00:00Z', 1],
+            ['2015-02-01T00:00:00Z', '2015-03-01T00:00:00Z', 0],
+            ['2010-01-01T00:00:00Z', '2014-01-01T00:00:00Z', 4],
+        ];
     }
 }

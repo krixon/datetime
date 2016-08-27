@@ -378,6 +378,11 @@ class DateTimeTest extends \PHPUnit_Framework_TestCase
         
         self::assertTrue($future->isInTheFuture());
         self::assertFalse($past->isInTheFuture());
+        
+        // Sleep for a short time in case the above manipulations and assertions happened in the same
+        // microsecond.
+        usleep(10);
+        
         self::assertFalse($now->isInTheFuture());
     }
     
@@ -395,7 +400,7 @@ class DateTimeTest extends \PHPUnit_Framework_TestCase
         self::assertFalse($future->isInThePast());
         
         // Sleep for a short time in case the above manipulations and assertions happened in the same
-        // microsecond (because PHP is that fast...).
+        // microsecond.
         usleep(10);
         
         self::assertTrue($now->isInThePast());
