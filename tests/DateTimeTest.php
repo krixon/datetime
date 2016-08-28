@@ -393,6 +393,7 @@ class DateTimeTest extends \PHPUnit_Framework_TestCase
     public function testIsInThePast()
     {
         $now    = DateTime::now();
+        $now    = DateTime::now();
         $future = $now->add('PT1H');
         $past   = $now->subtract('PT1H');
         
@@ -442,9 +443,9 @@ class DateTimeTest extends \PHPUnit_Framework_TestCase
     
     
     /**
-     * @covers ::dayOfWeek
+     * @covers ::dayOfWeekLocal
      */
-    public function testDayOfWeek()
+    public function testDayOfWeekLocal()
     {
         $date = DateTime::create('2016-08-01T00:00:00Z'); // Monday
         
@@ -454,9 +455,9 @@ class DateTimeTest extends \PHPUnit_Framework_TestCase
     
     
     /**
-     * @covers ::dayOfWeekIso
+     * @covers ::dayOfWeek
      */
-    public function testDayOfWeekIso()
+    public function testDayOfWeek()
     {
         $date = DateTime::create('2016-08-01T00:00:00Z'); // Monday
         
