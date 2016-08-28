@@ -448,8 +448,8 @@ class DateTimeTest extends \PHPUnit_Framework_TestCase
     {
         $date = DateTime::create('2016-08-01T00:00:00Z'); // Monday
         
-        self::assertSame(1, $date->dayOfWeek('en_GB'));
-        self::assertSame(2, $date->dayOfWeek('en_US'));
+        self::assertSame(1, $date->dayOfWeekLocal('en_GB'));
+        self::assertSame(2, $date->dayOfWeekLocal('en_US'));
     }
     
     
@@ -460,7 +460,7 @@ class DateTimeTest extends \PHPUnit_Framework_TestCase
     {
         $date = DateTime::create('2016-08-01T00:00:00Z'); // Monday
         
-        self::assertSame(1, $date->dayOfWeekIso());
+        self::assertSame(1, $date->dayOfWeek());
     }
     
     
