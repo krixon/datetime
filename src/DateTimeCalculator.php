@@ -21,11 +21,6 @@ class DateTimeCalculator
      */
     private $base;
     
-    /**
-     * @var \DateTime
-     */
-    private $date;
-    
     
     /**
      * @param DateTime $date
@@ -34,6 +29,15 @@ class DateTimeCalculator
     {
         $this->base = $date;
         $this->date = $date->toInternalDateTime();
+    }
+    
+    
+    /**
+     * @inheritdoc
+     */
+    public function __clone()
+    {
+        $this->date = clone $this->date;
     }
     
     
