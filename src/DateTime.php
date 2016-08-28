@@ -367,6 +367,17 @@ class DateTime implements \Serializable, \JsonSerializable
     
     
     /**
+     * Returns a calculator based on this date.
+     *
+     * @return DateTimeCalculator
+     */
+    public function calculator() : DateTimeCalculator
+    {
+        return DateTimeCalculator::basedOn($this);
+    }
+    
+    
+    /**
      * @param self $other
      * @param bool $absolute
      *
