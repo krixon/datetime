@@ -14,7 +14,7 @@
   },
   "autoload-dev": {
     "psr-4": {
-      "Krixon\\DateTime\\Test\\": "test"
+      "Krixon\\DateTime\\Test\\": "tests"
     }
   },
   "require": {
