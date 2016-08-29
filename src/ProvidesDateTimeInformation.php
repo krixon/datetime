@@ -5,19 +5,13 @@ namespace Krixon\DateTime;
 trait ProvidesDateTimeInformation
 {
     /**
-     * @var \DateTime
-     */
-    private $date;
-    
-    
-    /**
      * @param string $format
      *
      * @return string
      */
     public function format(string $format) : string
     {
-        return $this->date->format($format);
+        return $this->date()->format($format);
     }
     
     
@@ -93,9 +87,9 @@ trait ProvidesDateTimeInformation
      */
     public function dayOfWeekLocal(string $locale = null) : int
     {
-        $calendar = $this->calendar($locale);
+        $calendar = $this->createCalendar($locale);
         
-        return (int)$calendar->get(\IntlCalendar::FIELD_DOW_LOCAL);
+        return $calendar->get(\IntlCalendar::FIELD_DOW_LOCAL);
     }
     
     
@@ -142,7 +136,7 @@ trait ProvidesDateTimeInformation
      */
     public function timestamp() : int
     {
-        return $this->date->getTimestamp();
+        return $this->date()->getTimestamp();
     }
     
     
@@ -327,13 +321,21 @@ trait ProvidesDateTimeInformation
     
     
     /**
+     * The internal date object for which to provide information.
+     *
+     * @return \DateTime
+     */
+    abstract protected function date() : \DateTime;
+    
+    
+    /**
      * @param string|null $locale
      *
      * @return \IntlCalendar
      */
-    protected function calendar(string $locale = null) : \IntlCalendar
+    private function createCalendar(string $locale = null) : \IntlCalendar
     {
-        $timezone = \IntlTimeZone::createTimeZone($this->date->getTimezone()->getName());
+        $timezone = \IntlTimeZone::createTimeZone($this->date()->getTimezone()->getName());
         $calendar = \IntlCalendar::createInstance($timezone, $locale);
         
         $calendar->setTime($this->timestampWithMillisecond());

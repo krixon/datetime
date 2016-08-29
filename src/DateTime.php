@@ -16,6 +16,32 @@ class DateTime implements \Serializable, \JsonSerializable
     use ProvidesDateTimeInformation,
         ResolvesDateIntervals;
     
+    const MON = 1;
+    const TUE = 2;
+    const WED = 3;
+    const THU = 4;
+    const FRI = 5;
+    const SAT = 6;
+    const SUN = 7;
+    
+    const JAN = 1;
+    const FEB = 2;
+    const MAR = 3;
+    const APR = 4;
+    const MAY = 5;
+    const JUN = 6;
+    const JUL = 7;
+    const AUG = 8;
+    const SEP = 9;
+    const OCT = 10;
+    const NOV = 11;
+    const DEC = 12;
+    
+    /**
+     * @var \DateTime
+     */
+    private $date;
+    
     
     public function __construct($time = 'now', DateTimeZone $timezone = null, string $format = null)
     {
@@ -241,6 +267,49 @@ class DateTime implements \Serializable, \JsonSerializable
     
     
     /**
+     * Returns a new instance with the date set to the specified instance of the week day in the current month.
+     *
+     * For example, given Monday and 1, this would set the date to the first Monday of the month. Given Friday and 3,
+     * it would set the day of week to the third Friday of the month.
+     *
+     * Maximum occurrence is 5. Negative occurrences are allowed up to a maximum of -5, in which case the relevant
+     * occurrence from the end of the month is used. For example, Friday, -2 would be the penultimate Friday of
+     * the month.
+     *
+     * 0 is not a valid occurrence.
+     *
+     * Note that if the occurrence exceeds the number of occurrences in the month the date will overflow (or underflow)
+     * to the next (or previous) month. For example, if the 5th Monday of the month is required in a month with only
+     * 4 Mondays, the date will actually be the first Monday of the following month.
+     *
+     * @param int $dayOfWeek  The day of the week where 1 is Monday.
+     * @param int $occurrence
+     *
+     * @return DateTime
+     */
+    public function withDateAtDayOfWeekInMonth(int $dayOfWeek, int $occurrence) : self
+    {
+        self::assertValidDayOfWeek($dayOfWeek);
+        
+        if ($occurrence < -5 || $occurrence === 0 || $occurrence > 5) {
+            throw new \InvalidArgumentException("Invalid occurrence: $occurrence.");
+        }
+        
+        $calendar = $this->createCalendar();
+        
+        // IntlCalendar uses Sunday as day 1 - convert that to Monday as day 1.
+        if (++$dayOfWeek === 8) {
+            $dayOfWeek = 1;
+        }
+        
+        $calendar->set(\IntlCalendar::FIELD_DAY_OF_WEEK, $dayOfWeek);
+        $calendar->set(\IntlCalendar::FIELD_DAY_OF_WEEK_IN_MONTH, $occurrence);
+        
+        return static::fromIntlCalendar($calendar);
+    }
+    
+    
+    /**
      * Returns a new instance with the date set to 1st of the current month and time set to midnight.
      *
      * @param string|null $locale The locale with which to determine the week start day. If not set the default locale
@@ -362,7 +431,7 @@ class DateTime implements \Serializable, \JsonSerializable
      */
     public function toIntlCalendar(string $locale = null) : IntlCalendar
     {
-        return $this->calendar($locale);
+        return $this->createCalendar($locale);
     }
     
     
@@ -485,5 +554,27 @@ class DateTime implements \Serializable, \JsonSerializable
     public function jsonSerialize()
     {
         return $this->__toString();
+    }
+    
+    
+    /**
+     * @inheritdoc
+     */
+    protected function date() : \DateTime
+    {
+        return $this->date;
+    }
+    
+    
+    /**
+     * @param int $dayOfWeek
+     */
+    private static function assertValidDayOfWeek(int $dayOfWeek)
+    {
+        static $valid = [self::MON, self::TUE, self::WED, self::THU, self::FRI, self::SAT, self::SUN];
+        
+        if (!in_array($dayOfWeek, $valid, true)) {
+            throw new \InvalidArgumentException("Invalid day of week: $dayOfWeek.");
+        }
     }
 }

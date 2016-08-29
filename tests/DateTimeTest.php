@@ -9,7 +9,7 @@ use Krixon\DateTime\DateTime;
  * @covers ::<protected>
  * @covers ::<private>
  */
-class DateTimeTest extends \PHPUnit_Framework_TestCase
+class DateTimeTest extends DateTimeTestCase
 {
     /**
      * @covers ::fromFormat
@@ -581,6 +581,32 @@ class DateTimeTest extends \PHPUnit_Framework_TestCase
         $date = DateTime::create('2015-09-15T13:46:21Z')->withDateAtEndOfMonth();
         
         self::assertSame('2015-09-30T00:00:00+00:00', $date->format('c'));
+    }
+    
+    
+    /**
+     * @dataProvider withDateAtDayOfWeekInMonthProvider
+     * @covers ::withDateAtDayOfWeekInMonth
+     *
+     * @param string $date
+     * @param int    $dayOfWeek
+     * @param int    $occurrence
+     * @param string $expected
+     */
+    public function testWithDateAtDayOfWeekInMonth(string $date, int $dayOfWeek, int $occurrence, string $expected)
+    {
+        $date = DateTime::create($date)->withDateAtDayOfWeekInMonth($dayOfWeek, $occurrence);
+        
+        self::assertSameDate($expected, $date);
+    }
+    
+    
+    public function withDateAtDayOfWeekInMonthProvider() : array
+    {
+        return [
+            ['2015-09-15 13:46:21', DateTime::MON, 3, '2015-09-21 13:46:21'],
+            ['2015-09-15 13:46:21', DateTime::MON, 5, '2015-10-05 13:46:21'], // Overflow to next month.
+        ];
     }
     
     
