@@ -72,6 +72,35 @@ class DateTime implements \Serializable, \JsonSerializable
     
     
     /**
+     * @param int $dayOfWeek
+     */
+    public static function assertValidDayOfWeek(int $dayOfWeek)
+    {
+        static $valid = [self::MON, self::TUE, self::WED, self::THU, self::FRI, self::SAT, self::SUN];
+        
+        if (!in_array($dayOfWeek, $valid, true)) {
+            throw new \InvalidArgumentException("Invalid day of week: $dayOfWeek.");
+        }
+    }
+    
+    
+    /**
+     * @param int $month
+     */
+    public static function assertValidMonth(int $month)
+    {
+        static $valid = [
+            self::JAN, self::FEB, self::MAR, self::APR, self::MAY, self::JUN, self::JUL, self::AUG, self::SEP,
+            self::OCT, self::NOV, self::DEC
+        ];
+        
+        if (!in_array($month, $valid, true)) {
+            throw new \InvalidArgumentException("Invalid month: $month.");
+        }
+    }
+    
+    
+    /**
      * @param string            $time
      * @param DateTimeZone|null $timezone
      *
@@ -563,18 +592,5 @@ class DateTime implements \Serializable, \JsonSerializable
     protected function date() : \DateTime
     {
         return $this->date;
-    }
-    
-    
-    /**
-     * @param int $dayOfWeek
-     */
-    private static function assertValidDayOfWeek(int $dayOfWeek)
-    {
-        static $valid = [self::MON, self::TUE, self::WED, self::THU, self::FRI, self::SAT, self::SUN];
-        
-        if (!in_array($dayOfWeek, $valid, true)) {
-            throw new \InvalidArgumentException("Invalid day of week: $dayOfWeek.");
-        }
     }
 }
