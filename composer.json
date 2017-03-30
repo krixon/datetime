@@ -4,8 +4,8 @@
   "type": "library",
   "license": "MIT",
   "support": {
-    "issues": "https://bitbucket.org/krixon/datetime/issues",
-    "wiki": "https://bitbucket.org/krixon/datetime/wiki"
+    "issues": "https://github.com/krixon/datetime/issues",
+    "wiki": "https://github.com/krixon/datetime/wiki"
   },
   "autoload": {
     "psr-4": {
@@ -21,6 +21,7 @@
     "php-64bit": ">=7"
   },
   "require-dev": {
-    "phpunit/phpunit": "5.4.*"
+    "phpunit/phpunit": "5.4.*",
+    "satooshi/php-coveralls": "^1.0"
   }
 }
