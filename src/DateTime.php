@@ -41,14 +41,20 @@ class DateTime implements \Serializable, \JsonSerializable
      * @var \DateTime
      */
     private $date;
-    
-    
+
+
     public function __construct($time = 'now', DateTimeZone $timezone = null, string $format = null)
     {
         if ($format) {
             $this->date = \DateTime::createFromFormat($format, $time, $timezone);
+            $message    = "Cannot create date with value '$time' from format '$format'.";
         } else {
             $this->date = new \DateTime($time, $timezone);
+            $message    = "Cannot create date with value '$time'.";
+        }
+
+        if (false === $this->date) {
+            throw new \InvalidArgumentException($message);
         }
     }
     
