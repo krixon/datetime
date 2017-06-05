@@ -608,8 +608,37 @@ class DateTimeTest extends DateTimeTestCase
             ['2015-09-15 13:46:21', DateTime::MON, 5, '2015-10-05 13:46:21'], // Overflow to next month.
         ];
     }
-    
-    
+
+
+    /**
+     * @dataProvider withTimezoneProvider
+     * @covers ::withTimeZone
+     *
+     * @param string $initialTz
+     * @param string $newTz
+     * @param string $expected
+     */
+    public function testWithTimezone(string $initialTz, string $newTz, string $expected)
+    {
+        $before = DateTime::create($expected, new \DateTimeZone($initialTz));
+        $after  = $before->withTimeZone(new \DateTimeZone($newTz));
+
+        // String representations should be different.
+        self::assertNotSame($before->format('c'), $after->format('c'));
+
+        // Dates should be considered equal.
+        self::assertSameDate($expected, $after);
+    }
+
+
+    public function withTimezoneProvider() : array
+    {
+        return [
+            ['UTC', 'Asia/Tokyo', '2015-09-15 13:46:21'],
+        ];
+    }
+
+
     /**
      * @covers ::__clone
      */

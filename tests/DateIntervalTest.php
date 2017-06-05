@@ -102,4 +102,30 @@ class DateIntervalTest extends \PHPUnit_Framework_TestCase
             ['2015-01-01T00:00:00.000000', '2016-02-03T04:05:06.123456', '1y 1m 2d 4h 5m 6s 123456µs 398td'],
         ];
     }
+
+
+    /**
+     * @dataProvider totalSecondsProvider
+     * @covers ::totalSeconds
+     *
+     * @param string $specification
+     * @param int    $expected
+     */
+    public function testTotalSeconds(string $specification, int $expected)
+    {
+        $interval = DateInterval::fromSpecification($specification);
+
+        self::assertSame($expected, $interval->totalSeconds());
+    }
+
+
+    public function totalSecondsProvider() : array
+    {
+        return [
+            ['PT1U', 0],
+            ['PT1S1U', 1],
+            ['PT1M1S1U', 61],
+            ['PT1H1M1S1U', 3661],
+        ];
+    }
 }

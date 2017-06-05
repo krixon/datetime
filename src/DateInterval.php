@@ -24,6 +24,11 @@ class DateInterval
      * @var int
      */
     private $microseconds = 0;
+
+    /**
+     * @var int
+     */
+    private $totalMicroseconds;
     
     
     /**
@@ -85,7 +90,7 @@ class DateInterval
         
         // If the specification is just the duration designator it means that only microseconds were specified.
         // In that case we  create an empty interval for convenience.
-        if ('P' === $specification) {
+        if ('P' === $specification || 'PT' === $specification) {
             $specification = 'P0Y';
         }
         
@@ -248,7 +253,47 @@ class DateInterval
     {
         return $this->wrapped->days;
     }
-    
+
+
+    /**
+     * The total number of seconds represented by the interval, as a float.
+     *
+     * @return int
+     */
+    public function totalSeconds() : int
+    {
+        return $this->totalMicroseconds() / 1000000;
+    }
+
+
+    /**
+     * The total number of milliseconds represented by the interval.
+     *
+     * @return int
+     */
+    public function totalMilliseconds() : int
+    {
+        return $this->totalMicroseconds() / 1000;
+    }
+
+
+    /**
+     * The total number of microseconds represented by the interval.
+     *
+     * @return int
+     */
+    public function totalMicroseconds() : int
+    {
+        if (null === $this->totalMicroseconds) {
+            $reference = DateTime::now();
+            $end       = $reference->add($this);
+
+            $this->totalMicroseconds = $end->timestampWithMicrosecond() - $reference->timestampWithMicrosecond();
+        }
+
+        return $this->totalMicroseconds;
+    }
+
     
     /**
      * @return int

@@ -444,8 +444,29 @@ class DateTime implements \Serializable, \JsonSerializable
     {
         return $this->withTimeAt(0, 0, 0, 0);
     }
-    
-    
+
+
+    /**
+     * Returns a new instance with the specified timezone.
+     *
+     * @param DateTimeZone $timezone
+     *
+     * @return DateTime
+     */
+    public function withTimeZone(\DateTimeZone $timezone) : self
+    {
+        if ($this->timezone()->getName() === $timezone->getName()) {
+            return $this;
+        }
+
+        $instance = clone $this;
+
+        $instance->date->setTimezone($timezone);
+
+        return $instance;
+    }
+
+
     /**
      * Returns an internal, mutable \DateTime object with the same value as this instance.
      *
