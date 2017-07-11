@@ -128,4 +128,30 @@ class DateIntervalTest extends \PHPUnit_Framework_TestCase
             ['PT1H1M1S1U', 3661],
         ];
     }
+
+
+    /**
+     * @dataProvider formatProvider
+     * @covers ::format
+     *
+     * @param string $specification
+     * @param string $format
+     * @param string $expected
+     */
+    public function testFormat(string $specification, string $format, string $expected)
+    {
+        $interval = DateInterval::fromSpecification($specification);
+
+        self::assertSame($expected, $interval->format($format));
+    }
+
+
+    public function formatProvider()
+    {
+        return [
+            ['PT1U', '%y %m %d %h %i %s %u', '0 0 0 0 0 0 1'],
+            ['PT1U', '%%y %%m %%d %%h %%i %%s %%u', '%y %m %d %h %i %s %u'], // Escaping, including microseconds.
+            ['PT1H1M1S1U', '%y %m %d %h %i %s %u', '0 0 0 1 1 1 1'],
+        ];
+    }
 }

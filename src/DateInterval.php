@@ -9,9 +9,6 @@ namespace Krixon\DateTime;
  * microseconds. For example PT42U represents a duration of 42µs.
  *
  * This also supports microsecond resolution when created from date strings or diffs from DateTime or DateRange.
- *
- * TODO: Support decimal fraction in the smallest component. This means disallowing it for microseconds if it appears
- * elsewhere, and supporting it in microseconds.
  */
 class DateInterval
 {
@@ -234,8 +231,18 @@ class DateInterval
     public function format(string $format) : string
     {
         // Replace microseconds first so they become literals.
-        // FIXME: This needs to correctly handle literal percent signs followed by u.
-        $format = str_replace('%u', $this->microseconds, $format);
+        // Ignore any escaped microsecond identifiers.
+        $format = preg_replace_callback(
+            // Starting at the start of the string or the first non % character,
+            // consume pairs of % characters (effectively consuming all escaped %s)
+            // and finally match the string %u.
+            '/((?:^|[^%])(?:%{2})*)(%u)/',
+            function (array $matches) {
+                return $matches[1] . $this->microseconds;
+            },
+            $format
+        );
+
         $format = $this->wrapped->format($format);
         
         return $format;
