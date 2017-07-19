@@ -219,6 +219,22 @@ class DateInterval
             $this->wrapped->days  == $other->wrapped->days &&
             $this->microseconds   == $other->microseconds;
     }
+
+
+    /**
+     * Determines if an instance contains another.
+     *
+     * An instance contains another if it is at least as long. For example, PT1M contains PT1S, PT2S ... PT60S / PT1M,
+     * but it does not contain PT61S or PT2M.
+     *
+     * @param DateInterval $other
+     *
+     * @return bool
+     */
+    public function contains(self $other) : bool
+    {
+        return $this->totalMicroseconds() >= $other->totalMicroseconds();
+    }
     
     
     /**

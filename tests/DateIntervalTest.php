@@ -154,4 +154,34 @@ class DateIntervalTest extends \PHPUnit_Framework_TestCase
             ['PT1H1M1S1U', '%y %m %d %h %i %s %u', '0 0 0 1 1 1 1'],
         ];
     }
+
+
+    /**
+     * @dataProvider containsProvider
+     * @covers ::contains
+     *
+     * @param string $first
+     * @param string $second
+     * @param bool   $expected
+     */
+    public function testContains(string $first, string $second, bool $expected)
+    {
+        $first  = DateInterval::fromSpecification($first);
+        $second = DateInterval::fromSpecification($second);
+
+        self::assertSame($expected, $first->contains($second));
+    }
+
+
+    public function containsProvider()
+    {
+        return [
+            ['PT1M', 'PT1S', true],
+            ['PT1M', 'PT59S', true],
+            ['PT1M', 'PT60S', true],
+            ['PT1M', 'PT1M', true],
+            ['PT1M', 'PT61S', false],
+            ['PT1M', 'PT2M', false],
+        ];
+    }
 }
