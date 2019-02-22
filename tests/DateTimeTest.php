@@ -105,35 +105,50 @@ class DateTimeTest extends DateTimeTestCase
         
         self::assertSame('2016-08-20 10:47:13.123000', $date->format('Y-m-d H:i:s.u'));
     }
-    
-    
+
+
     /**
+     * @param int    $timestamp
+     * @param string $expected
+     *
+     * @dataProvider createFromTimestampWithMicrosecondsProvider
      * @covers ::fromTimestampWithMicroseconds
      */
-    public function testCreateFromTimestampWithMicroseconds()
+    public function testCreateFromTimestampWithMicroseconds(int $timestamp, string $expected)
     {
-        $timestamp = 1471690033123456;
-        $date      = DateTime::fromTimestampWithMicroseconds($timestamp);
-        
-        self::assertSame('2016-08-20 10:47:13.123456', $date->format('Y-m-d H:i:s.u'));
+        $date = DateTime::fromTimestampWithMicroseconds($timestamp);
+
+        self::assertSame($expected, $date->format('Y-m-d H:i:s.u'));
     }
-    
-    
+
+
+    public static function createFromTimestampWithMicrosecondsProvider() : array
+    {
+        return [
+            [1471690033123456, '2016-08-20 10:47:13.123456'],
+            [1550839719096496, '2019-02-22 12:48:39.096496'],
+            [1550839719000496, '2019-02-22 12:48:39.000496'],
+            [1550839719000006, '2019-02-22 12:48:39.000006'],
+            [1550839719000000, '2019-02-22 12:48:39.000000'],
+        ];
+    }
+
+
     /**
      * @covers ::fromIntlCalendar
      */
     public function testCreateFromIntlCalendar()
     {
         $calendar = \IntlCalendar::createInstance();
-        
+
         $calendar->setTime(1471690033123);
-        
+
         $date = DateTime::fromIntlCalendar($calendar);
-        
+
         self::assertSame('2016-08-20 10:47:13.123000', $date->format('Y-m-d H:i:s.u'));
     }
-    
-    
+
+
     /**
      * @covers ::diff
      */

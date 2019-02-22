@@ -191,6 +191,10 @@ class DateTime implements \Serializable, \JsonSerializable
     {
         $seconds      = (int)($timestamp / 10 ** 6);
         $microseconds = $timestamp - ($seconds * 10 ** 6);
+
+        // Ensure microseconds are right-padded with zeros because values like 012345 will be 12345 when expressed
+        // as an integer, and the concatenation below will therefore shift digits left by one place.
+        $microseconds = str_pad($microseconds, 6, '0', STR_PAD_LEFT);
         
         return static::fromFormat('U.u', $seconds . '.' . $microseconds);
     }
