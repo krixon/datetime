@@ -64,7 +64,7 @@ class DateTime implements \Serializable, \JsonSerializable
      */
     public function __toString() : string
     {
-        return $this->format(\DateTime::ISO8601);
+        return $this->format('Y-m-d\TH:i:s.uP'); // RFC3339 with microseconds.
     }
     
     
