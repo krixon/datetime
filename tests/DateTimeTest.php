@@ -5,7 +5,7 @@ namespace Krixon\DateTime\Test;
 use Krixon\DateTime\DateTime;
 
 /**
- * @coversDefaultClass Krixon\DateTime\DateTime
+ * @coversDefaultClass \Krixon\DateTime\DateTime
  * @covers ::<protected>
  * @covers ::<private>
  */

@@ -4,13 +4,14 @@ namespace Krixon\DateTime\Test;
 
 use Krixon\DateTime\DateInterval;
 use Krixon\DateTime\DateTime;
+use PHPUnit\Framework\TestCase;
 
 /**
- * @coversDefaultClass Krixon\DateTime\DateInterval
+ * @coversDefaultClass \Krixon\DateTime\DateInterval
  * @covers ::<protected>
  * @covers ::<private>
  */
-class DateIntervalTest extends \PHPUnit_Framework_TestCase
+class DateIntervalTest extends TestCase
 {
     /**
      * @dataProvider createFromSpecificationProvider

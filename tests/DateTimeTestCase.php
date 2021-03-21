@@ -3,10 +3,11 @@
 namespace Krixon\DateTime\Test;
 
 use Krixon\DateTime\DateTime;
+use PHPUnit\Framework\TestCase;
 
-class DateTimeTestCase extends \PHPUnit_Framework_TestCase
+class DateTimeTestCase extends TestCase
 {
-    public static function setUpBeforeClass()
+    public static function setUpBeforeClass() : void
     {
         parent::setUpBeforeClass();
 

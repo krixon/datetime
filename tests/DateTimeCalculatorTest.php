@@ -4,13 +4,14 @@ namespace Krixon\DateTime\Test;
 
 use Krixon\DateTime\DateTime;
 use Krixon\DateTime\DateTimeCalculator;
+use PHPUnit\Framework\TestCase;
 
 /**
- * @coversDefaultClass Krixon\DateTime\DateTimeCalculator
+ * @coversDefaultClass \Krixon\DateTime\DateTimeCalculator
  * @covers ::<protected>
  * @covers ::<private>
  */
-class DateTimeCalculatorTest extends \PHPUnit_Framework_TestCase
+class DateTimeCalculatorTest extends TestCase
 {
     /**
      * @dataProvider addProvider

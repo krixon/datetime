@@ -18,10 +18,10 @@
     }
   },
   "require": {
-    "php-64bit": ">=7"
+    "php-64bit": "^7.3 | ^8.0"
   },
   "require-dev": {
-    "phpunit/phpunit": "5.4.*",
-    "satooshi/php-coveralls": "^1.0"
+    "phpunit/phpunit": "9.5.*",
+    "php-coveralls/php-coveralls": "2.4.*"
   }
 }

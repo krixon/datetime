@@ -5,13 +5,14 @@ namespace Krixon\DateTime\Test;
 use Krixon\DateTime\DateInterval;
 use Krixon\DateTime\DateRange;
 use Krixon\DateTime\DateTime;
+use PHPUnit\Framework\TestCase;
 
 /**
- * @coversDefaultClass Krixon\DateTime\DateRange
+ * @coversDefaultClass \Krixon\DateTime\DateRange
  * @covers ::<protected>
  * @covers ::<private>
  */
-class DateRangeTest extends \PHPUnit_Framework_TestCase
+class DateRangeTest extends TestCase
 {
     /**
      * @covers ::from

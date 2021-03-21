@@ -1,15 +1,27 @@
+os: linux
+dist: xenial
 language: php
 
 php:
-  - 7.0
-  - 7.1
+  - 7.3
+  - 7.4
+  - 8.0
+
+env:
+  - DEPENDENCIES=lowest
+  - DEPENDENCIES=highest
+
+cache:
+  directories:
+    - $HOME/.composer/cache/files
 
 install:
-    - composer install
+  - if [ "$DEPENDENCIES" = "lowest" ]; then composer update --prefer-dist --prefer-lowest -n; fi;
+  - if [ "$DEPENDENCIES" = "highest" ]; then composer update --prefer-dist -n; fi;
 
 script:
   - mkdir -p build/logs
-  - php vendor/bin/phpunit -c phpunit.xml --coverage-clover build/logs/clover.xml
+  - XDEBUG_MODE=coverage php vendor/bin/phpunit -c phpunit.xml.dist --coverage-clover build/logs/clover.xml
 
 after_success:
-  - sh -c 'if [ "$TRAVIS_PHP_VERSION" != "hhvm" ]; then php vendor/bin/coveralls -v; fi;'
+  - travis_retry php vendor/bin/php-coveralls -v
